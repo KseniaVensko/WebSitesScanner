@@ -1,6 +1,7 @@
 package com.kseniavensko;
 
 import com.beust.jcommander.JCommander;
+import com.kseniavensko.Fakes.FakeScanner;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -38,7 +39,11 @@ public class Main {
         if (jct.hosts != null) {
             hosts.addAll(jct.hosts);
         }
-
+        IScanner scanner = new FakeScanner();
+        scanner.scan(hosts, jct.proxy_type, jct.proxy_addr, jct.headers, false);
+        ScanResult result = scanner.returnResults();
+        
+        System.out.println(result.asText());
         //Scanner scanner = new Scanner(hosts, jct.proxy_type, jct.proxy_addr, jct.headers, resolveDns);
         //Scanner.Scan(); -> new thread() -> observer --
         //show scan progress in this thread          <__|

@@ -1,12 +1,18 @@
 package com.kseniavensko;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 
 import org.json.JSONObject;
+//public class ScanResult<T extends Result> extends ArrayList<T> {
 public class ScanResult {
     private List<Result> results;
+
+    public ScanResult(List<Result> results) {
+        this.results=results;
+    }
 
     public String asText() {
         // TODO: j-text-utils
