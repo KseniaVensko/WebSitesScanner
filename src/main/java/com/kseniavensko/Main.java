@@ -18,7 +18,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        Arguments jct = new Arguments();
+        final Arguments jct = new Arguments();
         JCommander jcm = new JCommander(jct, args);
        /* jcm.usage();
         */
@@ -32,13 +32,18 @@ public class Main {
         if (jct.hosts != null) {
             hosts.addAll(jct.hosts);
         }
-        IScanner scanner = new FakeScanner();
-        scanner.scan(hosts, jct.proxy_type, jct.proxy_addr, jct.headers, false);
-        ScanResult result = scanner.returnResults();
 
-        System.out.println(result.asText());
-        //Scanner.Scan(); -> new thread() -> observer --
-        //show scan progress in this thread          <__|
+        final List<URL> finalHosts = hosts;
 
+        final ProgressObserver ob = new ProgressObserver();
+//        new Thread(new Runnable() {
+//            public void run() {
+                FakeScanner scanner = new FakeScanner();
+                scanner.addObserver(ob);
+                scanner.scan(finalHosts, jct.proxy_type, jct.proxy_addr, jct.headers, false);
+                ScanResult result = scanner.returnResults();
+                System.out.println("\n" + result.asText());
+//            }
+//        }).start();
     }
 }

@@ -43,6 +43,14 @@ public class Result {
         this.stringStatus = stringStatus;
     }
 
+    public Map<String, String> getSecureCookieFlags() {
+        return secureCookieFlags;
+    }
+
+    public void setSecureCookieFlags(Map<String, String> secureCookieFlags) {
+        this.secureCookieFlags = secureCookieFlags;
+    }
+
     enum Status {
         Checked, Failed
     }
