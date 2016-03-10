@@ -9,7 +9,7 @@ import java.util.List;
 //import org.apache.commons.cli.*;
 
 //String[] argv = { "--host", "http://127.0.0.1:8000", "https://ololo:443", "--file", "file.txt" };
-//WebSiteScanner --url 127.0.0.1 --port 8000 --method http --proxy_type http --proxy_url 127.0.0.2 --proxy_port 8080
+//WebSiteScanner --host http://127.0.0.1:80 --proxy_type http --proxy_url 127.0.0.2 --proxy_port 8080
 //WebSiteScanner -u 127.0.0.1 -p 8000 -m http
 //WebSiteScanner -u 127.0.0.1 -p 8000 -m http --headers "one : one_value" "two : two_value"
 //WebSiteScanner --input sites.txt --output result.json
@@ -20,8 +20,8 @@ public class Main {
     public static void main(String[] args) {
         final Arguments jct = new Arguments();
         JCommander jcm = new JCommander(jct, args);
-       /* jcm.usage();
-        */
+//       jcm.usage();
+
         List<URL> hosts = new ArrayList<URL>();
 
         if (jct.file != null) {

@@ -1,6 +1,5 @@
 package com.kseniavensko;
 
-import com.oracle.javafx.jmx.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -22,7 +21,7 @@ public class ScanResult {
         // TODO: j-text-utils
         StringBuilder resultString = new StringBuilder();
         for (Result result : results) {
-            resultString.append(result.getHost().toString() + "\n");
+            resultString.append("\n" + result.getHost().toString() + "\n");
             try {
                 if (result.getSecureHeaders() != null) {
                     resultString.append("Secure headers:\n");
@@ -55,7 +54,7 @@ public class ScanResult {
         JSONObject obj = new JSONObject();
 
         for (Result result : results) {
-            try {
+
                 obj.put("host", result.getHost().toString());
                 if (result.getSecureHeaders() != null) {
                     JSONArray secureHeaders = new JSONArray();
@@ -67,9 +66,6 @@ public class ScanResult {
                     informationHeaders.addAll(result.getInformationHeaders().keySet());
                     obj.put("Information headers", informationHeaders);
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
         }
         try {
             System.out.println("\nJSON Object: " + obj);
@@ -78,8 +74,6 @@ public class ScanResult {
             fileWriter.flush();
             fileWriter.close();
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
