@@ -13,8 +13,8 @@ public class FakeScanner extends Observable implements IScanner {
         int i = 0;
         int j = hosts.size();
         for (URL host : hosts) {
-            IConnection con = new FakeConnection(host);
-            //IConnection con = new Connection(host);
+            //IConnection con = new FakeConnection(host);
+            IConnection con = new Connection(host);
             Result result = new Result();
             result.setHost(host);
             result.setStringStatus("good");
