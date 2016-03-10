@@ -1,9 +1,6 @@
 package com.kseniavensko.Fakes;
 
-import com.kseniavensko.IConnection;
-import com.kseniavensko.IScanner;
-import com.kseniavensko.Result;
-import com.kseniavensko.ScanResult;
+import com.kseniavensko.*;
 
 import java.net.URL;
 import java.util.*;
@@ -17,13 +14,14 @@ public class FakeScanner extends Observable implements IScanner {
         int j = hosts.size();
         for (URL host : hosts) {
             IConnection con = new FakeConnection(host);
+            //IConnection con = new Connection(host);
             Result result = new Result();
-            result.setStringStatus("good" + host.toString());
+            result.setHost(host);
+            result.setStringStatus("good");
             result.setInformationHeaders(con.getResponseHeaders());
             results.add(result);
             i++;
             setChanged();
-            // scanned: n/m
             notifyObservers("scanned: " + i + "/" + j);
         }
     }

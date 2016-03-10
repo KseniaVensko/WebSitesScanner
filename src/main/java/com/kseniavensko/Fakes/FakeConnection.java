@@ -18,21 +18,21 @@ public class FakeConnection implements IConnection {
 
     public Map<String, List<String>> getResponseHeaders() {
         try {
-            Thread.sleep(5000);                 //1000 milliseconds is one second.
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
 
         return new HashMap<String, List<String>>() {
             {
-                put(host.getPath() + "First", new ArrayList<String>() {
+                put("First", new ArrayList<String>() {
                     {
                         add("First.One");
                         add("First.Two");
                         add("First.Three");
                     }
                 });
-                put(host.getPath() + "Second", new ArrayList<String>() {
+                put("Second", new ArrayList<String>() {
                     {
                         add("Second.One");
                         add("Second.Two");

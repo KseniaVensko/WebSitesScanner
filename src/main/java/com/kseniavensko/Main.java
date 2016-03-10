@@ -38,11 +38,14 @@ public class Main {
         final ProgressObserver ob = new ProgressObserver();
 //        new Thread(new Runnable() {
 //            public void run() {
-                FakeScanner scanner = new FakeScanner();
-                scanner.addObserver(ob);
-                scanner.scan(finalHosts, jct.proxy_type, jct.proxy_addr, jct.headers, false);
-                ScanResult result = scanner.returnResults();
-                System.out.println("\n" + result.asText());
+        FakeScanner scanner = new FakeScanner();
+        scanner.addObserver(ob);
+        scanner.scan(finalHosts, jct.proxy_type, jct.proxy_addr, jct.headers, false);
+        ScanResult result = scanner.returnResults();
+        result.toConsole();
+        if (jct.json_file != null) {
+            result.toJsonFile(jct.json_file);
+        }
 //            }
 //        }).start();
     }

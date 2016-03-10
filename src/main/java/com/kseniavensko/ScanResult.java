@@ -1,39 +1,86 @@
 package com.kseniavensko;
 
-import java.util.ArrayList;
+import com.oracle.javafx.jmx.json.JSONException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 
-import org.json.JSONObject;
 //public class ScanResult<T extends Result> extends ArrayList<T> {
 public class ScanResult {
     private List<Result> results;
 
     public ScanResult(List<Result> results) {
-        this.results=results;
+        this.results = results;
     }
 
-    public String asText() {
+    public void toConsole() {
         // TODO: j-text-utils
         StringBuilder resultString = new StringBuilder();
         for (Result result : results) {
+            resultString.append(result.getHost().toString() + "\n");
             try {
-                for (Map.Entry<String, List<String>> entry : result.getInformationHeaders().entrySet()) {
-                    resultString.append(entry.getKey());
-                    resultString.append("/");
-                    resultString.append(entry.getValue());
+                if (result.getSecureHeaders() != null) {
+                    resultString.append("Secure headers:\n");
+                    for (Result.secureHeader secureHeader : result.getSecureHeaders()) {
+                        resultString.append(secureHeader.name + "\t" + secureHeader.correct);
+                        for (String value : secureHeader.values) {
+                            resultString.append(value);
+                        }
+                        resultString.append("\n");
+                    }
+                }
+                if (result.getInformationHeaders() != null) {
+                    resultString.append("Information headers:\n");
+                    for (Map.Entry<String, List<String>> entry : result.getInformationHeaders().entrySet()) {
+                        resultString.append(entry.getKey());
+                        resultString.append(" / ");
+                        resultString.append(entry.getValue());
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            resultString.append("\n" + result.getStringStatus());
             resultString.append("\n\n");
         }
-        return resultString.toString();
+        System.out.println( resultString.toString());
     }
 
-    public String asJson() {
+    public void toJsonFile(String file) {
         JSONObject obj = new JSONObject();
-        return new String();
+
+        for (Result result : results) {
+            try {
+                obj.put("host", result.getHost().toString());
+                if (result.getSecureHeaders() != null) {
+                    JSONArray secureHeaders = new JSONArray();
+                    secureHeaders.addAll(result.getSecureHeaders());
+                    obj.put("Secure headers", secureHeaders);
+                }
+                if (result.getInformationHeaders() != null) {
+                    JSONArray informationHeaders = new JSONArray();
+                    informationHeaders.addAll(result.getInformationHeaders().keySet());
+                    obj.put("Information headers", informationHeaders);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            System.out.println("\nJSON Object: " + obj);
+            FileWriter fileWriter = new FileWriter(file);
+            fileWriter.write(obj.toJSONString());
+            fileWriter.flush();
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

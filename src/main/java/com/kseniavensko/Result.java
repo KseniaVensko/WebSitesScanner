@@ -1,9 +1,11 @@
 package com.kseniavensko;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
 public class Result {
+    private URL host;
     private Status status;
     private Analyse analyse;
     private List<secureHeader> secureHeaders;
@@ -49,6 +51,14 @@ public class Result {
 
     public void setSecureCookieFlags(Map<String, String> secureCookieFlags) {
         this.secureCookieFlags = secureCookieFlags;
+    }
+
+    public URL getHost() {
+        return host;
+    }
+
+    public void setHost(URL host) {
+        this.host = host;
     }
 
     enum Status {
