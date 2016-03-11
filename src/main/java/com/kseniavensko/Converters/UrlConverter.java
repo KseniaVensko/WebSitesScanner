@@ -1,4 +1,4 @@
-package com.kseniavensko;
+package com.kseniavensko.Converters;
 
 import com.beust.jcommander.IStringConverter;
 

@@ -14,10 +14,12 @@ public class Connection implements IConnection{
     //private String proxyType = null;
     private String proxyUrl;
     private int proxyPort;
+    private Map<String, String> headers;
     //private URLConnection connection = null;
 
-    public Connection(URL host) {
+    public Connection(URL host, Map<String, String> headers) {
         this.host = host;
+        this.headers = headers;
     }
 
     public Connection(URL host, String proxyType, URL proxyAddr) {
@@ -56,6 +58,11 @@ public class Connection implements IConnection{
         URLConnection connection = null;
         try {
             connection = openConnection();
+            if (headers != null) {
+                for (Map.Entry<String, String> entry : headers.entrySet()) {
+                    connection.setRequestProperty(entry.getKey(), entry.getValue());
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

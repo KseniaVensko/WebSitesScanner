@@ -24,7 +24,7 @@ public class ScanResult {
             resultString.append("\n" + result.getHost().toString() + "\n");
             try {
                 if (result.getSecureHeaders() != null) {
-                    resultString.append("Secure headers:\n");
+                    resultString.append("\nSecure headers:\n");
                     for (Result.secureHeader secureHeader : result.getSecureHeaders()) {
                         resultString.append(secureHeader.name + "\t" + secureHeader.correct);
                         for (String value : secureHeader.values) {
@@ -34,12 +34,26 @@ public class ScanResult {
                     }
                 }
                 if (result.getInformationHeaders() != null) {
-                    resultString.append("Information headers:\n");
-                    for (Map.Entry<String, List<String>> entry : result.getInformationHeaders().entrySet()) {
-                        resultString.append(entry.getKey());
-                        resultString.append(" / ");
-                        resultString.append(entry.getValue());
+                    resultString.append("\nInformation headers:\n");
+
+                    for (Result.informationHeader header : result.getInformationHeaders()) {
+                        resultString.append(header.name + " : ");
+                        for (String value : header.values) {
+                            resultString.append("\n\t" + value);
+                        }
+                            resultString.append("\n");
                     }
+
+
+//                    for (Map.Entry<String, List<String>> entry : result.getInformationHeaders().) {
+//                        for (String v : entry.getValue()){
+//                            resultString.append(entry.getKey() + ":" + v);
+//                        }
+////                        resultString.append(entry.getKey());
+////                        resultString.append(" / ");
+////                        resultString.append(entry.getValue());
+//                        resultString.append("\n");
+//                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -54,18 +68,17 @@ public class ScanResult {
         JSONObject obj = new JSONObject();
 
         for (Result result : results) {
-
                 obj.put("host", result.getHost().toString());
                 if (result.getSecureHeaders() != null) {
                     JSONArray secureHeaders = new JSONArray();
                     secureHeaders.addAll(result.getSecureHeaders());
                     obj.put("Secure headers", secureHeaders);
                 }
-                if (result.getInformationHeaders() != null) {
-                    JSONArray informationHeaders = new JSONArray();
-                    informationHeaders.addAll(result.getInformationHeaders().keySet());
-                    obj.put("Information headers", informationHeaders);
-                }
+//                if (result.getInformationHeaders() != null) {
+//                    JSONArray informationHeaders = new JSONArray();
+//                    informationHeaders.addAll(result.getInformationHeaders().keySet());
+//                    obj.put("Information headers", informationHeaders);
+//                }
         }
         try {
             System.out.println("\nJSON Object: " + obj);

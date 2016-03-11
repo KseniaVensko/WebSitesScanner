@@ -6,28 +6,10 @@ import java.util.Map;
 
 public class Result {
     private URL host;
-    private Status status;
-    private Analyse analyse;
     private List<secureHeader> secureHeaders;
     private Map<String, String> secureCookieFlags;
-    private Map<String, List<String>> informationHeaders;
+    private List<informationHeader> informationHeaders;
     private String stringStatus;
-
-    public Map<String, List<String>> getInformationHeaders() {
-        return informationHeaders;
-    }
-
-    public void setInformationHeaders(Map<String, List<String>> informationHeaders) {
-        this.informationHeaders = informationHeaders;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
 
     public List<secureHeader> getSecureHeaders() {
         return secureHeaders;
@@ -61,12 +43,16 @@ public class Result {
         this.host = host;
     }
 
-    enum Status {
-        Checked, Failed
+    public List<informationHeader> getInformationHeaders() {
+        return informationHeaders;
     }
 
-    class Analyse {
-        // TODO: Do I need it?
+    public void setInformationHeaders(List<informationHeader> informationHeaders) {
+        this.informationHeaders = informationHeaders;
+    }
+
+    enum Status {
+        Checked, Failed
     }
 
     class secureHeader {
@@ -75,7 +61,6 @@ public class Result {
         List<String> values;
     }
 
-    //TODO: Do I need it?
     class informationHeader {
         boolean present;
         String name;

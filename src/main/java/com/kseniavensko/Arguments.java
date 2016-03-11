@@ -2,6 +2,8 @@ package com.kseniavensko;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.FileConverter;
+import com.kseniavensko.Converters.HeadersConverter;
+import com.kseniavensko.Converters.UrlConverter;
 
 import java.io.File;
 import java.net.URL;
@@ -19,8 +21,8 @@ public class Arguments {
     @Parameter(names = "--proxy_addr", description = "IP addr of proxy", converter = UrlConverter.class)
     URL proxy_addr;
 
-    @Parameter(names = "--headers", description = "http headers")
-    public Map<String, List<String>> headers;
+    @Parameter(names = "--headers", description = "http headers", converter = HeadersConverter.class)
+    public Map<String, String> headers;
 
     @Parameter(names = "--input_file", converter = FileConverter.class)
     File file;

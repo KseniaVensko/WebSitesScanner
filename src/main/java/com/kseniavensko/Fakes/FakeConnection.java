@@ -11,9 +11,11 @@ import java.util.Map;
 public class FakeConnection implements IConnection {
 
     private final URL host;
+    private Map<String, String> headers;
 
-    public FakeConnection(URL host) {
+    public FakeConnection(URL host, Map<String, String> headers) {
         this.host = host;
+        this.headers = headers;
     }
 
     public Map<String, List<String>> getResponseHeaders() {
@@ -37,6 +39,11 @@ public class FakeConnection implements IConnection {
                         add("Second.One");
                         add("Second.Two");
                         add("Second.Three");
+                    }
+                });
+                put("x-content-type-options", new ArrayList<String>() {
+                    {
+                        add("nosniff");
                     }
                 });
             }
