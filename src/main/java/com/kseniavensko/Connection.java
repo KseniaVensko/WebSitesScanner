@@ -5,7 +5,7 @@ import java.net.*;
 import java.util.List;
 import java.util.Map;
 
-public class Connection implements IConnection{
+    public class Connection implements IConnection {
     private URL host;
     private String url;
     private int port;
@@ -54,17 +54,13 @@ public class Connection implements IConnection{
 //        connection = url.openConnection();
 //    }
 
-    public Map<String, List<String>> getResponseHeaders() {
+    public Map<String, List<String>> getResponseHeaders() throws IOException {
         URLConnection connection = null;
-        try {
-            connection = openConnection();
-            if (headers != null) {
-                for (Map.Entry<String, String> entry : headers.entrySet()) {
-                    connection.setRequestProperty(entry.getKey(), entry.getValue());
-                }
+        connection = openConnection();
+        if (headers != null) {
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                connection.setRequestProperty(entry.getKey(), entry.getValue());
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         if (connection != null) {
             return connection.getHeaderFields();

@@ -52,7 +52,7 @@ public class Result {
     }
 
     enum Status {
-        Checked, Failed
+        Correct, Missing, Warning
     }
 
     class secureHeader {
@@ -62,7 +62,7 @@ public class Result {
     }
 
     class informationHeader {
-        boolean present;
+        Status status;
         String name;
         List<String> values;
     }

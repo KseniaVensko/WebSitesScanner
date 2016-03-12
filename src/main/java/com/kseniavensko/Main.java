@@ -41,8 +41,6 @@ public class Main {
         final List<URL> finalHosts = hosts;
 
         final ProgressObserver ob = new ProgressObserver();
-//        new Thread(new Runnable() {
-//            public void run() {
         //FakeScanner scanner = new FakeScanner();
         Scanner scanner = new Scanner();
         scanner.addObserver(ob);
@@ -52,7 +50,5 @@ public class Main {
         if (jct.json_file != null) {
             result.toJsonFile(jct.json_file);
         }
-//            }
-//        }).start();
     }
 }
