@@ -15,17 +15,23 @@ public class Scanner extends Observable implements IScanner {
         int i = 0;
         int j = hosts.size();
         for (URL host : hosts) {
-            //IConnection con = new FakeConnection(host);
-            IConnection con = new Connection(host, headers);
+            IConnection con = new FakeConnection(host, headers);
+//            IConnection con = new Connection(host, headers);
             Result result = new Result();
             result.setHost(host);
             result.setStringStatus("good");
             Map<String, List<String>> responseHeaders = null;
             try {
-                responseHeaders = con.getResponseHeaders();
+                Map<String, List<String>> response = con.getResponseHeaders();
+                if (response.containsKey(null)) {
+                    response.remove(null);
+                }
+                responseHeaders = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+                responseHeaders.putAll(response);
             } catch (IOException e) {
                 result.setStringStatus("bad");
             }
+
             result.setInformationHeaders(parseInformationHeaders(responseHeaders));
             result.setSecureHeaders(parseSecureHeaders(responseHeaders));
             results.add(result);
@@ -39,13 +45,13 @@ public class Scanner extends Observable implements IScanner {
         return new ScanResult(results);
     }
 
-    private List<Result.informationHeader> parseInformationHeaders(Map<String, List<String>> headers) {
-        List<Result.informationHeader> informationHeaderList = new ArrayList<Result.informationHeader>();
+    private List<Result.Header> parseInformationHeaders(Map<String, List<String>> headers) {
+        List<Result.Header> informationHeaderList = new ArrayList<Result.Header>();
 
         for (String h : informationHeaders) {
-            Result.informationHeader header = new Result().new informationHeader();
+            Result.Header header = new Result().new Header();
             header.name = h;
-            if (headers.containsKey(h)) {
+            if (headers != null && headers.containsKey(h)) {
                 header.values = headers.get(h);
                 header.status = Result.Status.Correct;
             }
@@ -58,32 +64,24 @@ public class Scanner extends Observable implements IScanner {
         return informationHeaderList;
     }
 
-    private List<Result.secureHeader> parseSecureHeaders(Map<String, List<String>> headers) {
-        List<Result.secureHeader> secureHeaders = new ArrayList<Result.secureHeader>();
+    private List<Result.Header> parseSecureHeaders(Map<String, List<String>> headers) {
+        List<Result.Header> secureHeaders = new ArrayList<Result.Header>();
 
-            for (final Map.Entry<String, List<String>> entry : headers.entrySet()) {
-                final String header = entry.getKey() == null ? null: entry.getKey().toLowerCase();
-
-                if (recommendedSecureHeaders.containsKey(header)) {
-                    Result.secureHeader h = new Result().new secureHeader();
-                    h.name = header;
-                    h.values = entry.getValue();
-                    h.correct = true;
-
-                    for (String value : h.values) {
-                        // TODO: this is not correct
-                        h.correct &= containsRecommendedOption(h.name, value);
-                    }
-                    //  h.correct = containsRecommendedOption(h.name, h.values);
-                    secureHeaders.add(h);
-                }
+        for (String h : recommendedSecureHeaders.keySet()) {
+            Result.Header header = new Result().new Header();
+            header.name = h;
+            if (headers != null && headers.containsKey(h)) {
+                //TODO: check correctness
+                header.values = headers.get(h);
+                header.status = Result.Status.Correct;
             }
+            else {
+                header.status = Result.Status.Missing;
+            }
+            secureHeaders.add(header);
+        }
 
         return secureHeaders;
-    }
-
-    private void processHeaders() {
-
     }
 
     private boolean containsRecommendedOption(String header, String value) {

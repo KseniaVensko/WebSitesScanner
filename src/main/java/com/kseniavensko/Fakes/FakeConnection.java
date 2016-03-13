@@ -27,14 +27,14 @@ public class FakeConnection implements IConnection {
 
         return new HashMap<String, List<String>>() {
             {
-                put("First", new ArrayList<String>() {
+                put("Server", new ArrayList<String>() {
                     {
                         add("First.One");
                         add("First.Two");
                         add("First.Three");
                     }
                 });
-                put("Second", new ArrayList<String>() {
+                put("x-powered-by", new ArrayList<String>() {
                     {
                         add("Second.One");
                         add("Second.Two");

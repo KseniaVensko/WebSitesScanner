@@ -1,21 +1,24 @@
 package com.kseniavensko;
 
+import org.junit.Assert;
+
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
 public class Result {
     private URL host;
-    private List<secureHeader> secureHeaders;
+    private List<Header> secureHeaders;
     private Map<String, String> secureCookieFlags;
-    private List<informationHeader> informationHeaders;
+    private List<Header> informationHeaders;
     private String stringStatus;
 
-    public List<secureHeader> getSecureHeaders() {
+    public List<Header> getSecureHeaders() {
         return secureHeaders;
     }
 
-    public void setSecureHeaders(List<secureHeader> secureHeaders) {
+    public void setSecureHeaders(List<Header> secureHeaders) {
+        Assert.assertNotNull(secureHeaders);
         this.secureHeaders = secureHeaders;
     }
 
@@ -43,11 +46,12 @@ public class Result {
         this.host = host;
     }
 
-    public List<informationHeader> getInformationHeaders() {
+    public List<Header> getInformationHeaders() {
         return informationHeaders;
     }
 
-    public void setInformationHeaders(List<informationHeader> informationHeaders) {
+    public void setInformationHeaders(List<Header> informationHeaders) {
+        Assert.assertNotNull(informationHeaders);
         this.informationHeaders = informationHeaders;
     }
 
@@ -55,13 +59,7 @@ public class Result {
         Correct, Missing, Warning
     }
 
-    class secureHeader {
-        boolean correct;
-        String name;
-        List<String> values;
-    }
-
-    class informationHeader {
+    class Header {
         Status status;
         String name;
         List<String> values;

@@ -6,7 +6,6 @@ import org.json.simple.JSONObject;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 
 //public class ScanResult<T extends Result> extends ArrayList<T> {
@@ -23,41 +22,17 @@ public class ScanResult {
         for (Result result : results) {
             resultString.append("\n" + result.getHost().toString() + "\n");
             try {
-                if (result.getSecureHeaders() != null) {
-                    resultString.append("\nSecure headers\n");
-                    for (Result.secureHeader secureHeader : result.getSecureHeaders()) {
-                        resultString.append(secureHeader.name + "\t" + secureHeader.correct);
-                        for (String value : secureHeader.values) {
-                            resultString.append(value);
-                        }
-                        resultString.append("\n");
-                    }
+                resultString.append("\nInformation headers\n");
+                for (Result.Header header : result.getInformationHeaders()) {
+                    appendHeader(resultString, header);
                 }
-                if (result.getInformationHeaders() != null) {
-                    resultString.append("\nInformation headers\n");
 
-                    for (Result.informationHeader header : result.getInformationHeaders()) {
-                        resultString.append(header.name + " : ");
-                        resultString.append(header.status.toString());
-                        if (header.status != Result.Status.Missing) {
-                            for (String value : header.values) {
-                                resultString.append("\n\t" + value);
-                            }
-                        }
-                        resultString.append("\n");
-                    }
-
-
-//                    for (Map.Entry<String, List<String>> entry : result.getInformationHeaders().) {
-//                        for (String v : entry.getValue()){
-//                            resultString.append(entry.getKey() + ":" + v);
-//                        }
-////                        resultString.append(entry.getKey());
-////                        resultString.append(" / ");
-////                        resultString.append(entry.getValue());
-//                        resultString.append("\n");
-//                    }
+                resultString.append("\nSecure headers\n");
+                for (Result.Header header : result.getSecureHeaders()) {
+                    appendHeader(resultString, header);
                 }
+
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -68,29 +43,61 @@ public class ScanResult {
     }
 
     public void toJsonFile(String file) {
-        JSONObject obj = new JSONObject();
+        JSONObject hosts = new JSONObject();
 
         for (Result result : results) {
-            obj.put("host", result.getHost().toString());
-            if (result.getSecureHeaders() != null) {
-                JSONArray secureHeaders = new JSONArray();
-                secureHeaders.addAll(result.getSecureHeaders());
-                obj.put("Secure headers", secureHeaders);
+            JSONObject options = new JSONObject();
+
+            JSONObject informationHeaders = new JSONObject();
+            for (Result.Header h : result.getInformationHeaders()) {
+                addHeaderObject(informationHeaders, h);
             }
-//                if (result.getInformationHeaders() != null) {
-//                    JSONArray informationHeaders = new JSONArray();
-//                    informationHeaders.addAll(result.getInformationHeaders().keySet());
-//                    obj.put("Information headers", informationHeaders);
-//                }
+            options.put("information_headers", informationHeaders);
+
+
+            JSONObject secureHeaders = new JSONObject();
+            for (Result.Header h : result.getSecureHeaders()) {
+                addHeaderObject(secureHeaders, h);
+            }
+            options.put("secure_headers", secureHeaders);
+            hosts.put(result.getHost().toString(), options);
+
         }
+
         try {
-            System.out.println("\nJSON Object: " + obj);
+            System.out.println("\nJSON Object: " + hosts);
             FileWriter fileWriter = new FileWriter(file);
-            fileWriter.write(obj.toJSONString());
+            fileWriter.write(hosts.toJSONString());
             fileWriter.flush();
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void appendHeader(StringBuilder resultString, Result.Header header) {
+        resultString.append(header.name + " : ");
+        resultString.append(header.status.toString());
+        if (header.status != Result.Status.Missing) {
+            for (String value : header.values) {
+                resultString.append("\n\t" + value);
+            }
+        }
+        resultString.append("\n");
+    }
+
+    private void addHeaderObject(JSONObject headers, Result.Header h) {
+        JSONObject header = new JSONObject();
+        JSONArray values = new JSONArray();
+
+        if (h.status != Result.Status.Missing) {
+            for (String v : h.values) {
+                values.add(v);
+            }
+            header.put("values", values);
+        }
+        header.put("status", h.status.toString());
+
+        headers.put(h.name, header);
     }
 }

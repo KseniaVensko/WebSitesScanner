@@ -25,10 +25,6 @@ public class Main {
 
         List<URL> hosts = new ArrayList<URL>();
 
-//        for (Map.Entry<String, String> entry : jct.headers.entrySet()) {
-//            System.out.println(entry.getKey() + "/" + entry.getValue());
-//        }
-
         if (jct.file != null) {
             UrlsReaderFromFile reader = new UrlsReaderFromFile();
             hosts = reader.read(jct.file);
@@ -41,7 +37,6 @@ public class Main {
         final List<URL> finalHosts = hosts;
 
         final ProgressObserver ob = new ProgressObserver();
-        //FakeScanner scanner = new FakeScanner();
         Scanner scanner = new Scanner();
         scanner.addObserver(ob);
         scanner.scan(finalHosts, jct.proxy_type, jct.proxy_addr, jct.headers, false);
