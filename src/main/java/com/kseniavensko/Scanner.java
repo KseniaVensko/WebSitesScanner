@@ -55,8 +55,7 @@ public class Scanner extends Observable implements IScanner {
             if (headers != null && headers.containsKey(h)) {
                 header.values = headers.get(h);
                 header.status = Result.Status.Correct;
-            }
-            else {
+            } else {
                 header.status = Result.Status.Missing;
             }
             informationHeaderList.add(header);
@@ -72,11 +71,14 @@ public class Scanner extends Observable implements IScanner {
             Result.Header header = new Result().new Header();
             header.name = h;
             if (headers != null && headers.containsKey(h)) {
-                //TODO: check correctness
                 header.values = headers.get(h);
-                header.status = Result.Status.Correct;
-            }
-            else {
+                boolean correct = false;
+                for (String value : header.values) {
+                    Matcher m = recommendedSecureHeaders.get(h).matcher(value);
+                    correct |= m.matches();
+                }
+                header.status = correct ? Result.Status.Correct : Result.Status.Warning;
+            } else {
                 header.status = Result.Status.Missing;
             }
             secureHeaders.add(header);
@@ -94,13 +96,16 @@ public class Scanner extends Observable implements IScanner {
 
     private HashMap<String, Pattern> recommendedSecureHeaders = new HashMap<String, Pattern>() {
         {
-            put("x-content-type-options", Pattern.compile("nosniff"));
-            put("x-xss-protection", Pattern.compile("1; mode=block"));
-            put("public-key-pins", Pattern.compile("pin-sha256=.*"));
+            put("public-key-pins", Pattern.compile("pin-sha256=.*", Pattern.CASE_INSENSITIVE));
+            put("strict-transport-security", Pattern.compile("(max-age=\"?\\d+\"?\\s?;?\\s?(includeSubDomains)?)|((includeSubDomains)?\\s?;?\\s?max-age=\"?\\d+\"?)", Pattern.CASE_INSENSITIVE));                      // RFC 6797 6.1
+            put("x-frame-options", Pattern.compile("deny", Pattern.CASE_INSENSITIVE));
+            put("x-xss-protection", Pattern.compile("1; mode=block", Pattern.CASE_INSENSITIVE));
+            put("x-content-type-options", Pattern.compile("nosniff", Pattern.CASE_INSENSITIVE));
+            put("content-security-policy", Pattern.compile("default-src", Pattern.CASE_INSENSITIVE));
         }
     };
 
-    private ArrayList<String> informationHeaders = new ArrayList<String>(){
+    private ArrayList<String> informationHeaders = new ArrayList<String>() {
         {
             add("server");
             add("x-powered-by");
