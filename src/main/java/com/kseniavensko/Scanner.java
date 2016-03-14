@@ -15,19 +15,20 @@ public class Scanner extends Observable implements IScanner {
         int i = 0;
         int j = hosts.size();
         for (URL host : hosts) {
-            IConnection con = new FakeConnection(host, headers);
-//            IConnection con = new Connection(host, headers);
+//            IConnection con = new FakeConnection(host, headers);
+            IConnection con = new Connection(host, headers);
             Result result = new Result();
             result.setHost(host);
             result.setStringStatus("good");
             Map<String, List<String>> responseHeaders = null;
             try {
                 Map<String, List<String>> response = con.getResponseHeaders();
-                if (response.containsKey(null)) {
-                    response.remove(null);
-                }
                 responseHeaders = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
-                responseHeaders.putAll(response);
+                for (Map.Entry<String, List<String>> entry : response.entrySet()) {
+                    if (entry.getKey() != null) {
+                        responseHeaders.put(entry.getKey(), entry.getValue());
+                    }
+                }
             } catch (IOException e) {
                 result.setStringStatus("bad");
             }
