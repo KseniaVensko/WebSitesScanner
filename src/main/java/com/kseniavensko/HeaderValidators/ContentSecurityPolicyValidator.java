@@ -13,6 +13,7 @@ public class ContentSecurityPolicyValidator implements IHeaderValidator {
     }
 
     public boolean valid() {
+        //TODO: find out the correct way to validate
         return true;
         // Pattern.compile("default-src", Pattern.CASE_INSENSITIVE)
     }

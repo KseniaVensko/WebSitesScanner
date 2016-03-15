@@ -10,9 +10,9 @@ public class XContentTypeOptionsValidator implements IHeaderValidator {
     }
 
     public boolean valid() {
-//        for (String s : values) {
-//            if (s.equalsIgnoreCase("nosniff")) return true;
-//        }
+        for (String s : values) {
+            if (s.equalsIgnoreCase("nosniff")) return true;
+        }
         return false;
     }
 }

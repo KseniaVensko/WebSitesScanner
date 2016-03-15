@@ -1,8 +1,10 @@
 package com.kseniavensko.HeaderValidators;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
+/**
+ * rfc 7469
+ */
 public class PublicKeyPinsValidator implements IHeaderValidator {
     private List<String> values;
 
@@ -11,7 +13,10 @@ public class PublicKeyPinsValidator implements IHeaderValidator {
     }
 
     public boolean valid() {
-        return true;
-        //Pattern.compile("pin-sha256=.*", Pattern.CASE_INSENSITIVE)
+        for (String val : values) {
+            if (val.toLowerCase().contains("max-age") && val.toLowerCase().contains("pin-sha256"))
+                return true;
+        }
+        return false;
     }
 }
