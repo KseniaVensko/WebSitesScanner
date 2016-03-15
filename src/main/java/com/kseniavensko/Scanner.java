@@ -1,8 +1,10 @@
 package com.kseniavensko;
 
-import com.kseniavensko.Fakes.FakeConnection;
+import com.kseniavensko.HeaderValidators.*;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -73,10 +75,19 @@ public class Scanner extends Observable implements IScanner {
             if (headers != null && headers.containsKey(h)) {
                 header.values = headers.get(h);
                 boolean correct = false;
-                for (String value : header.values) {
-                    Matcher m = recommendedSecureHeaders.get(h).matcher(value);
-                    correct |= m.matches();
+
+                Constructor<?>[] c = recommendedSecureHeaders.get(h).getConstructors();
+                try {
+                    IHeaderValidator v = (IHeaderValidator) c[0].newInstance(header.values);
+                    correct = v.valid();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
                 }
+
                 header.status = correct ? Result.Status.Correct : Result.Status.Warning;
             } else {
                 header.status = Result.Status.Missing;
@@ -87,21 +98,19 @@ public class Scanner extends Observable implements IScanner {
         return secureHeaders;
     }
 
-    private boolean containsRecommendedOption(String header, String value) {
-        if (value == null) return false;
-        Pattern option = recommendedSecureHeaders.get(header);
-        Matcher m = option.matcher(value.toLowerCase());
-        return m.matches();
+    private boolean checkHeaderValues(String h) {
+
+        return false;
     }
 
-    private HashMap<String, Pattern> recommendedSecureHeaders = new HashMap<String, Pattern>() {
+    private HashMap<String, Class<? extends IHeaderValidator>> recommendedSecureHeaders = new HashMap<String, Class<? extends IHeaderValidator>>() {
         {
-            put("public-key-pins", Pattern.compile("pin-sha256=.*", Pattern.CASE_INSENSITIVE));
-            put("strict-transport-security", Pattern.compile("(max-age=\"?\\d+\"?\\s?;?\\s?(includeSubDomains)?)|((includeSubDomains)?\\s?;?\\s?max-age=\"?\\d+\"?)", Pattern.CASE_INSENSITIVE));                      // RFC 6797 6.1
-            put("x-frame-options", Pattern.compile("deny", Pattern.CASE_INSENSITIVE));
-            put("x-xss-protection", Pattern.compile("1; mode=block", Pattern.CASE_INSENSITIVE));
-            put("x-content-type-options", Pattern.compile("nosniff", Pattern.CASE_INSENSITIVE));
-            put("content-security-policy", Pattern.compile("default-src", Pattern.CASE_INSENSITIVE));
+            put("public-key-pins", PublicKeyPinsValidator.class);
+            put("strict-transport-security", StrictTransportSecurityValidator.class);
+            put("x-frame-options", XFrameOptionsValidator.class);
+            put("x-xss-protection", XXssProtectionValidator.class);
+            put("x-content-type-options", XContentTypeOptionsValidator.class);
+            put("content-security-policy", ContentSecurityPolicyValidator.class);
         }
     };
 
