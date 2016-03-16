@@ -1,5 +1,6 @@
 package com.kseniavensko;
 
+import com.kseniavensko.Fakes.FakeConnection;
 import com.kseniavensko.HeaderValidators.*;
 
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class Scanner extends Observable implements IScanner {
         HashMap<String, Result.Status> result = new HashMap<>();
         if (cookies != null) {
             for (String cookie : cookies) {
-                if (cookie.toLowerCase().contains("expires") || cookie.toLowerCase().contains("max-age"))       // session cookie doesn`t contain this fields
+                if (cookie.toLowerCase().contains("expires") || cookie.toLowerCase().contains("max-age"))       // session cookie doesn`t contain this fields (rfc 6265 4.1.2.2)
                     continue;
 
                 if (cookie.toLowerCase().contains("httponly") && cookie.toLowerCase().contains("secure")) {

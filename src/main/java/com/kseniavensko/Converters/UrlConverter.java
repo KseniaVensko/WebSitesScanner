@@ -10,9 +10,8 @@ public class UrlConverter implements IStringConverter<URL> {
         try {
             return new URL(s);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            System.out.println("URL is not correct: " + e.getMessage());
         }
-        //TODO: is this correct?
         return null;
     }
 }

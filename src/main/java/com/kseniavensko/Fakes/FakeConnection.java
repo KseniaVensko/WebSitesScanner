@@ -41,6 +41,13 @@ public class FakeConnection implements IConnection {
                         add("Second.Three");
                     }
                 });
+                put("Content-Security-Policy", new ArrayList<String>() {
+                    {
+                        add("frame-ancestors https://example.com/");
+                        add("default-src https:; report-uri https://example.com/;connect-src http://example.com/; script-src http://example.com/");
+                    }
+                });
+
                 put("x-content-type-options", new ArrayList<String>() {
                     {
                         add("nosniff");
@@ -50,3 +57,4 @@ public class FakeConnection implements IConnection {
         };
     }
 }
+

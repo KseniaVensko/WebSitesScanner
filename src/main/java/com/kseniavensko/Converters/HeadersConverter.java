@@ -12,10 +12,14 @@ public class HeadersConverter implements IStringConverter<Map<String, String>> {
         try {
             for (String h : headers) {
                 String[] entry = h.split(":");
-                map.put(entry[0], entry[1]);
+                if (entry.length < 2) {
+                    map.put(entry[0], null);
+                }
+                else {
+                    map.put(entry[0], entry[1]);
+                }
             }
         }
-        // TODO: check for exceptions
         catch (NullPointerException e) {
             e.printStackTrace();
         }

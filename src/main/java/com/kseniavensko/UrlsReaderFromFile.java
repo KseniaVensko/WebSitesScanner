@@ -13,7 +13,6 @@ public class UrlsReaderFromFile {
             BufferedReader br = new BufferedReader(r);
             String line;
             while ((line = br.readLine()) != null) {
-                // TODO: it's not beautiful maybe
                 hosts.add(new URL(line));
             }
             r.close();

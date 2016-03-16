@@ -29,12 +29,31 @@ public class Main {
             UrlsReaderFromFile reader = new UrlsReaderFromFile();
             hosts = reader.read(jct.file);
         }
-        // I`ve decided to allow use --host and --file together
+        // I`ve decided to allow use --host and --input_file together
         if (jct.hosts != null) {
             hosts.addAll(jct.hosts);
         }
 
         final List<URL> finalHosts = hosts;
+
+        if (finalHosts.isEmpty()) {
+            System.out.println("--host or --input_file is required\n");
+            return;
+        }
+
+        for (URL host : finalHosts) {
+            if (host == null)
+                return;
+        }
+
+        if (jct.headers != null) {
+            for (Map.Entry<String, String> val : jct.headers.entrySet()) {
+                if (val.getValue() == null) {
+                    System.out.println("header value is not correct for header : " + val.getKey());
+                }
+                return;
+            }
+        }
 
         final ProgressObserver ob = new ProgressObserver();
         Scanner scanner = new Scanner();
