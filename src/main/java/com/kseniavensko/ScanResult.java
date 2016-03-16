@@ -6,7 +6,7 @@ import org.json.simple.JSONObject;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
-
+import java.util.Map;
 
 //public class ScanResult<T extends Result> extends ArrayList<T> {
 public class ScanResult {
@@ -32,7 +32,12 @@ public class ScanResult {
                     appendHeader(resultString, header);
                 }
 
-
+                if (result.getSecureCookieFlags() != null) {
+                    resultString.append("\nSession cookies\n");
+                    for (Map.Entry<String, Result.Status> sessionCookie : result.getSecureCookieFlags().entrySet()) {
+                        resultString.append(sessionCookie.getKey() + " : " + sessionCookie.getValue());
+                    }
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -60,8 +65,15 @@ public class ScanResult {
                 addHeaderObject(secureHeaders, h);
             }
             options.put("secure_headers", secureHeaders);
-            hosts.put(result.getHost().toString(), options);
 
+            JSONObject sessionCookies = new JSONObject();
+            if (result.getSecureCookieFlags() != null) {
+                for (Map.Entry<String, Result.Status> sessionCookie : result.getSecureCookieFlags().entrySet()) {
+                    sessionCookies.put(sessionCookie.getKey(), sessionCookie.getValue());
+                }
+                options.put("session_cookies", sessionCookies);
+            }
+            hosts.put(result.getHost().toString(), options);
         }
 
         try {

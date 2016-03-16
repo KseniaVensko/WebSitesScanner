@@ -7,8 +7,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Scanner extends Observable implements IScanner {
     private List<Result> results = new ArrayList<Result>();
@@ -37,11 +35,30 @@ public class Scanner extends Observable implements IScanner {
 
             result.setInformationHeaders(parseInformationHeaders(responseHeaders));
             result.setSecureHeaders(parseSecureHeaders(responseHeaders));
+            result.setSecureCookieFlags(parseCookieHeader(responseHeaders.get("set-cookie")));
+
             results.add(result);
             i++;
             setChanged();
             notifyObservers("scanned: " + i + "/" + j);
         }
+    }
+
+    private HashMap<String, Result.Status> parseCookieHeader(List<String> cookies) {
+        HashMap<String, Result.Status> result = new HashMap<>();
+        if (cookies != null) {
+            for (String cookie : cookies) {
+                if (cookie.toLowerCase().contains("expires") || cookie.toLowerCase().contains("max-age"))       // session cookie doesn`t contain this fields
+                    continue;
+
+                if (cookie.toLowerCase().contains("httponly") && cookie.toLowerCase().contains("secure")) {
+                    result.put(cookie, Result.Status.Correct);
+                } else {
+                    result.put(cookie, Result.Status.Warning);
+                }
+            }
+        }
+        return result;
     }
 
     public ScanResult returnResults() {
@@ -96,11 +113,6 @@ public class Scanner extends Observable implements IScanner {
         }
 
         return secureHeaders;
-    }
-
-    private boolean checkHeaderValues(String h) {
-
-        return false;
     }
 
     private HashMap<String, Class<? extends IHeaderValidator>> recommendedSecureHeaders = new HashMap<String, Class<? extends IHeaderValidator>>() {

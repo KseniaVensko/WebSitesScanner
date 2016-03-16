@@ -9,7 +9,7 @@ import java.util.Map;
 public class Result {
     private URL host;
     private List<Header> secureHeaders;
-    private Map<String, String> secureCookieFlags;
+    private Map<String, Status> secureCookieFlags;
     private List<Header> informationHeaders;
     private String stringStatus;
 
@@ -30,14 +30,6 @@ public class Result {
         this.stringStatus = stringStatus;
     }
 
-    public Map<String, String> getSecureCookieFlags() {
-        return secureCookieFlags;
-    }
-
-    public void setSecureCookieFlags(Map<String, String> secureCookieFlags) {
-        this.secureCookieFlags = secureCookieFlags;
-    }
-
     public URL getHost() {
         return host;
     }
@@ -53,6 +45,14 @@ public class Result {
     public void setInformationHeaders(List<Header> informationHeaders) {
         Assert.assertNotNull(informationHeaders);
         this.informationHeaders = informationHeaders;
+    }
+
+    public Map<String, Status> getSecureCookieFlags() {
+        return secureCookieFlags;
+    }
+
+    public void setSecureCookieFlags(Map<String, Status> secureCookieFlags) {
+        this.secureCookieFlags = secureCookieFlags;
     }
 
     enum Status {
