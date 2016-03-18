@@ -21,6 +21,10 @@ public class Main {
     public static void main(String[] args) {
         final Arguments jct = new Arguments();
         JCommander jcm = new JCommander(jct, args);
+        if (jct.help) {
+            jcm.usage();
+            return;
+        }
 //       jcm.usage();
 
         List<URL> hosts = new ArrayList<URL>();
@@ -50,8 +54,8 @@ public class Main {
             for (Map.Entry<String, String> val : jct.headers.entrySet()) {
                 if (val.getValue() == null) {
                     System.out.println("header value is not correct for header : " + val.getKey());
+                    return;
                 }
-                return;
             }
         }
 

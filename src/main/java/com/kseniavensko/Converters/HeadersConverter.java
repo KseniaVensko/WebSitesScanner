@@ -11,12 +11,14 @@ public class HeadersConverter implements IStringConverter<Map<String, String>> {
         String[] headers = s.split(",");
         try {
             for (String h : headers) {
-                String[] entry = h.split(":");
-                if (entry.length < 2) {
-                    map.put(entry[0], null);
+                String[] parts = h.split(":", 2);
+                String name = parts[0];
+                String value = parts[1];
+                if (parts.length < 2) {
+                    map.put(name, null);
                 }
                 else {
-                    map.put(entry[0], entry[1]);
+                    map.put(name, value);
                 }
             }
         }
