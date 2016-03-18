@@ -9,12 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 //curl -I site  - retreive headers (to compare with my implementation)
-//String[] argv = { "--host", "http://127.0.0.1:8000", "https://ololo:443", "--file", "file.txt" };
-//WebSiteScanner --host http://127.0.0.1:80 --proxy_type http --proxy_addr 127.0.0.2:8080
-//WebSiteScanner -u http://127.0.0.1:80 -t http
-//WebSiteScanner -u http://127.0.0.1:80 -t http --headers "one : one_value" "two : two_value"
-//WebSiteScanner --input_file sites.txt --output_file result.json
-//WebSiteScanner -i sites.txt -o result.json --proxy_type http --proxy_addr 127.0.0.2:8080
 
 public class Main {
 
@@ -25,7 +19,6 @@ public class Main {
             jcm.usage();
             return;
         }
-//       jcm.usage();
 
         List<URL> hosts = new ArrayList<URL>();
 

@@ -93,7 +93,7 @@ public class ScanResult {
         }
 
         try {
-            System.out.println("\nJSON Object: " + hosts);
+            System.out.println("Writing output to json file");
             FileWriter fileWriter = new FileWriter(file);
             fileWriter.write(hosts.toJSONString());
             fileWriter.flush();
