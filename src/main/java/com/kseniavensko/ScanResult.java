@@ -20,18 +20,25 @@ public class ScanResult {
         // TODO: j-text-utils
         StringBuilder resultString = new StringBuilder();
         for (Result result : results) {
-            resultString.append("\n" + result.getHost().toString() + "\n");
+            resultString.append("\n" + result.getHost().toString());
+            if (result.getRedirectedHost() != null) {
+                resultString.append(" ---> " + result.getRedirectedHost());
+            }
+            resultString.append("\n");
+            resultString.append("\n" + result.getStringStatus());
             try {
-                resultString.append("\nInformation headers\n");
-                for (Result.Header header : result.getInformationHeaders()) {
-                    appendHeader(resultString, header);
+                if (result.getInformationHeaders() != null) {
+                    resultString.append("\nInformation headers\n");
+                    for (Result.Header header : result.getInformationHeaders()) {
+                        appendHeader(resultString, header);
+                    }
                 }
-
-                resultString.append("\nSecure headers\n");
-                for (Result.Header header : result.getSecureHeaders()) {
-                    appendHeader(resultString, header);
+                if (result.getSecureHeaders() != null) {
+                    resultString.append("\nSecure headers\n");
+                    for (Result.Header header : result.getSecureHeaders()) {
+                        appendHeader(resultString, header);
+                    }
                 }
-
                 if (result.getSecureCookieFlags() != null) {
                     resultString.append("\nSession cookies\n");
                     for (Map.Entry<String, Result.Status> sessionCookie : result.getSecureCookieFlags().entrySet()) {
@@ -41,7 +48,7 @@ public class ScanResult {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            resultString.append("\n" + result.getStringStatus());
+
             resultString.append("\n\n");
         }
         System.out.println(resultString.toString());
@@ -54,26 +61,35 @@ public class ScanResult {
             JSONObject options = new JSONObject();
 
             JSONObject informationHeaders = new JSONObject();
-            for (Result.Header h : result.getInformationHeaders()) {
-                addHeaderObject(informationHeaders, h);
+            if (result.getInformationHeaders() != null) {
+                for (Result.Header h : result.getInformationHeaders()) {
+                    addHeaderObject(informationHeaders, h);
+                }
             }
             options.put("information_headers", informationHeaders);
 
 
             JSONObject secureHeaders = new JSONObject();
-            for (Result.Header h : result.getSecureHeaders()) {
-                addHeaderObject(secureHeaders, h);
+            if (result.getSecureHeaders() != null) {
+                for (Result.Header h : result.getSecureHeaders()) {
+                    addHeaderObject(secureHeaders, h);
+                }
             }
             options.put("secure_headers", secureHeaders);
 
             JSONObject sessionCookies = new JSONObject();
             if (result.getSecureCookieFlags() != null) {
                 for (Map.Entry<String, Result.Status> sessionCookie : result.getSecureCookieFlags().entrySet()) {
-                    sessionCookies.put(sessionCookie.getKey(), sessionCookie.getValue());
+                    sessionCookies.put(sessionCookie.getKey(), sessionCookie.getValue().toString());
                 }
                 options.put("session_cookies", sessionCookies);
             }
-            hosts.put(result.getHost().toString(), options);
+            if (result.getRedirectedHost() != null) {
+                hosts.put(result.getHost().toString() + " ---> " + result.getRedirectedHost(), options);
+            }
+            else {
+                hosts.put(result.getHost().toString(), options);
+            }
         }
 
         try {

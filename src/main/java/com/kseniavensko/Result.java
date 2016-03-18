@@ -8,6 +8,7 @@ import java.util.Map;
 
 public class Result {
     private URL host;
+    private String redirectedHost;
     private List<Header> secureHeaders;
     private Map<String, Status> secureCookieFlags;
     private List<Header> informationHeaders;
@@ -53,6 +54,14 @@ public class Result {
 
     public void setSecureCookieFlags(Map<String, Status> secureCookieFlags) {
         this.secureCookieFlags = secureCookieFlags;
+    }
+
+    public String getRedirectedHost() {
+        return redirectedHost;
+    }
+
+    public void setRedirectedHost(String redirectedHost) {
+        this.redirectedHost = redirectedHost;
     }
 
     enum Status {

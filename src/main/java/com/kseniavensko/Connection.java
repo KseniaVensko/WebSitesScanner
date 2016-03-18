@@ -5,9 +5,9 @@ import java.net.*;
 import java.util.List;
 import java.util.Map;
 
-    public class Connection implements IConnection {
+public class Connection implements IConnection {
     private URL host;
-    private String url;
+    private String redirectedHost;
     private int port;
     private MethodEnum method;
     private ProxyType proxyType = null;
@@ -30,49 +30,50 @@ import java.util.Map;
         this.proxyPort = proxyAddr.getPort();
     }
 
-    public Connection(String url, int port, MethodEnum method) {
-        this.url = url;
-        this.port = port;
-        this.method = method;
-    }
-
-    public Connection(String url, int port, MethodEnum method, ProxyType proxy, String proxyUrl, int proxyPort) {
-        this.url = url;
-        this.port = port;
-        this.method = method;
-        this.proxyType = proxy;
-        this.proxyUrl = proxyUrl;
-        this.proxyPort = proxyPort;
-    }
-
-//    public void openConnection() throws IOException {
-//        URL url = new URL(method.value, this.url, port, "");
-//        if (proxyType != null) {
-//            Proxy proxy = new Proxy(proxyType.value, new InetSocketAddress(proxyUrl, proxyPort));
-//            connection =  url.openConnection(proxy);
-//        }
-//        connection = url.openConnection();
-//    }
-
     public Map<String, List<String>> getResponseHeaders() throws IOException {
-        URLConnection connection = null;
-        connection = openConnection();
-        if (headers != null) {
-            for (Map.Entry<String, String> entry : headers.entrySet()) {
-                connection.setRequestProperty(entry.getKey(), entry.getValue());
+        HttpURLConnection connection = null;
+        URL url = host;
+
+        while (true) {
+            connection = (HttpURLConnection) openConnection(url);
+            if (connection == null)
+                break;
+            connection.setConnectTimeout(15000);
+            connection.setReadTimeout(15000);
+            connection.setInstanceFollowRedirects(false);   // Make the logic below easier to detect redirections
+
+            if (headers != null) {
+                for (Map.Entry<String, String> entry : headers.entrySet()) {
+                    connection.setRequestProperty(entry.getKey(), entry.getValue());
+                }
             }
+//          URL base, next;
+
+            switch (connection.getResponseCode()) {
+                case HttpURLConnection.HTTP_MOVED_PERM:
+                case HttpURLConnection.HTTP_MOVED_TEMP:
+                    redirectedHost = connection.getHeaderField("Location");
+                    url = new URL(redirectedHost);
+                    //base = new URL(url.toString());
+                    //next = new URL(base, location);  // Deal with relative URLs
+                    //url = next.toExternalForm();
+                    continue;
+            }
+            break;
         }
-        if (connection != null) {
-            return connection.getHeaderFields();
-        } else return null;
+        return connection == null ? null : connection.getHeaderFields();
     }
 
-    private URLConnection openConnection() throws IOException {
+    private URLConnection openConnection(URL host) throws IOException {
         if (proxyType != null) {
             Proxy proxy = new Proxy(proxyType.value, new InetSocketAddress(proxyUrl, proxyPort));
             return host.openConnection(proxy);
         }
         return host.openConnection();
+    }
+
+    public String getRedirectedHost() {
+        return redirectedHost;
     }
 
     enum MethodEnum {

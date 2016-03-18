@@ -17,13 +17,17 @@ public class Scanner extends Observable implements IScanner {
         int j = hosts.size();
         for (URL host : hosts) {
 //            IConnection con = new FakeConnection(host, headers);
-            IConnection con = new Connection(host, headers);
+            Connection con = new Connection(host, headers);
             Result result = new Result();
             result.setHost(host);
-            result.setStringStatus("good");
+            //TODO: IConnection doesnt contain getRedirectedHost
+
+            result.setStringStatus("Connection established\n");
             Map<String, List<String>> responseHeaders = null;
             try {
                 Map<String, List<String>> response = con.getResponseHeaders();
+                // you should call getRedirectedHost after calling getResponseHeaders
+                result.setRedirectedHost(con.getRedirectedHost());
                 responseHeaders = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
                 for (Map.Entry<String, List<String>> entry : response.entrySet()) {
                     if (entry.getKey() != null) {
@@ -31,12 +35,13 @@ public class Scanner extends Observable implements IScanner {
                     }
                 }
             } catch (IOException e) {
-                result.setStringStatus("bad");
+                result.setStringStatus("Connection failed\n");
             }
-
-            result.setInformationHeaders(parseInformationHeaders(responseHeaders));
-            result.setSecureHeaders(parseSecureHeaders(responseHeaders));
-            result.setSecureCookieFlags(parseCookieHeader(responseHeaders.get("set-cookie")));
+            if (responseHeaders != null) {
+                result.setInformationHeaders(parseInformationHeaders(responseHeaders));
+                result.setSecureHeaders(parseSecureHeaders(responseHeaders));
+                result.setSecureCookieFlags(parseCookieHeader(responseHeaders.get("set-cookie")));
+            }
 
             results.add(result);
             i++;
