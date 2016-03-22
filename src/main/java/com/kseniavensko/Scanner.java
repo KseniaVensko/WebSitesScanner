@@ -15,12 +15,18 @@ public class Scanner extends Observable implements IScanner {
     private List<Result> results = new ArrayList<Result>();
     private Pattern cookiePattern = Pattern.compile("\\s*([a-zA-Z_0-9-]*)=.*");
 
-    public void scan(List<URL> hosts, String proxy_type, URL proxy_addr, Map<String, String> headers, boolean resolveDns) {
+    public void scan(List<URL> hosts, String proxy_type, String proxy_addr, Map<String, String> headers, boolean resolveDns) {
         int i = 0;
         int j = hosts.size();
         for (URL host : hosts) {
           //  IConnection con = new FakeConnection(host, headers);
-            IConnection con = new Connection(host, headers);
+            IConnection con;
+            if (proxy_addr != null && proxy_type != null) {
+                con = new Connection(host, proxy_type, proxy_addr, headers);
+            }
+            else {
+                con = new Connection(host, headers);
+            }
             Result result = new Result();
             result.setHost(host);
 

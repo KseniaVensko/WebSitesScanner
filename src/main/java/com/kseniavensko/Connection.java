@@ -22,12 +22,19 @@ public class Connection implements IConnection {
         this.headers = headers;
     }
 
-    public Connection(URL host, String proxyType, URL proxyAddr) {
+    public Connection(URL host, String proxyType, String proxyAddr, Map<String, String> headers) {
         this.host = host;
         this.proxyType = proxyType == "http" ? ProxyType.HTTP : ProxyType.SOCKS;
-        // TODO: think about correct way of storing proxy
-        this.proxyUrl = proxyAddr.getProtocol() + "://" + proxyAddr.getHost();
-        this.proxyPort = proxyAddr.getPort();
+        String[] proxy = proxyAddr.split(":", 2);
+        this.proxyUrl = proxy[0];
+        try {
+            this.proxyPort = Integer.parseInt(proxy[1]);
+        }
+        catch (Exception e) {
+            // TODO: log this
+            this.proxyPort = 80;
+        }
+        this.headers = headers;
     }
 
     public Map<String, List<String>> getResponseHeaders() throws IOException {
@@ -66,8 +73,14 @@ public class Connection implements IConnection {
 
     private URLConnection openConnection(URL host) throws IOException {
         if (proxyType != null) {
-            Proxy proxy = new Proxy(proxyType.value, new InetSocketAddress(proxyUrl, proxyPort));
-            return host.openConnection(proxy);
+            try {
+                Proxy proxy = new Proxy(proxyType.value, new InetSocketAddress(proxyUrl, proxyPort));
+                return host.openConnection(proxy);
+            }
+            catch (IllegalArgumentException e) {
+                // TODO: log this
+                host.openConnection();
+            }
         }
         return host.openConnection();
     }

@@ -19,8 +19,8 @@ public class Arguments {
     @Parameter(names = "--proxy_type", description = "Type of proxy(http or socks)")
     public String proxy_type;
 
-    @Parameter(names = "--proxy_addr", description = "IP addr of proxy", converter = UrlConverter.class)
-    URL proxy_addr;
+    @Parameter(names = "--proxy_addr", description = "IP addr of proxy")
+    String proxy_addr;
 
     @Parameter(names = "--headers", description = "Array of headers separated by commas\n\t\t\tfor more info see Readme", converter = HeadersConverter.class)
     public Map<String, String> headers;
