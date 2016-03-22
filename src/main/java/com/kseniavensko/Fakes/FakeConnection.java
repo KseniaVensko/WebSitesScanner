@@ -30,8 +30,6 @@ public class FakeConnection implements IConnection {
                 put("Server", new ArrayList<String>() {
                     {
                         add("First.One");
-                        add("First.Two");
-                        add("First.Three");
                     }
                 });
                 put("x-powered-by", new ArrayList<String>() {
@@ -41,10 +39,17 @@ public class FakeConnection implements IConnection {
                         add("Second.Three");
                     }
                 });
+//                put("Content-Security-Policy", new ArrayList<String>() {
+//                    {
+//                        add("frame-ancestors https://example.com/; form-action http://q");
+//                        add("default-src https:; report-uri https://example.com/;connect-src http://example.com/; script-src http://example.com/");
+//                    }
+//                });
+
                 put("Content-Security-Policy", new ArrayList<String>() {
                     {
-                        add("frame-ancestors https://example.com/");
-                        add("default-src https:; report-uri https://example.com/;connect-src http://example.com/; script-src http://example.com/");
+                        add("frame-ancestors https://example.com/; form-action http://q");
+                        add("default-src https:; report-uri https://example.com/; connect-src *; script-src http://example.com/");
                     }
                 });
 
@@ -55,6 +60,11 @@ public class FakeConnection implements IConnection {
                 });
             }
         };
+    }
+
+    @Override
+    public String getRedirectedHost() {
+        return "fake host";
     }
 }
 

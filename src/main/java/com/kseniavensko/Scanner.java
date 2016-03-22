@@ -16,11 +16,10 @@ public class Scanner extends Observable implements IScanner {
         int i = 0;
         int j = hosts.size();
         for (URL host : hosts) {
-//            IConnection con = new FakeConnection(host, headers);
-            Connection con = new Connection(host, headers);
+          //  IConnection con = new FakeConnection(host, headers);
+            IConnection con = new Connection(host, headers);
             Result result = new Result();
             result.setHost(host);
-            //TODO: IConnection doesnt contain getRedirectedHost
 
             result.setStringStatus("Connection established\n");
             Map<String, List<String>> responseHeaders = null;
