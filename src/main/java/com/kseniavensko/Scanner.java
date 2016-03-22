@@ -8,9 +8,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Scanner extends Observable implements IScanner {
     private List<Result> results = new ArrayList<Result>();
+    private Pattern cookiePattern = Pattern.compile("\\s*([a-zA-Z_0-9-]*)=.*");
 
     public void scan(List<URL> hosts, String proxy_type, URL proxy_addr, Map<String, String> headers, boolean resolveDns) {
         int i = 0;
@@ -53,8 +56,16 @@ public class Scanner extends Observable implements IScanner {
         HashMap<String, Result.Status> result = new HashMap<>();
         if (cookies != null) {
             for (String cookie : cookies) {
-                if (cookie.toLowerCase().contains("expires") || cookie.toLowerCase().contains("max-age"))       // session cookie doesn`t contain this fields (rfc 6265 4.1.2.2)
-                    continue;
+                Matcher m = cookiePattern.matcher(cookie);
+                if (m.matches()) {
+                    String name = m.group(1);
+                    // skip yandex metrika and google analytics
+                    if (googleCookies.contains(name) || yandexCookies.contains(name)) {
+                        continue;
+                    }
+                }
+//                if (cookie.toLowerCase().contains("expires") || cookie.toLowerCase().contains("max-age"))       // session cookie doesn`t contain this fields (rfc 6265 4.1.2.2)
+//                    continue;
 
                 if (cookie.toLowerCase().contains("httponly") && cookie.toLowerCase().contains("secure")) {
                     result.put(cookie, Result.Status.Correct);
@@ -140,6 +151,29 @@ public class Scanner extends Observable implements IScanner {
             add("x-version");
             add("x-powered-cms");
             add("content-security-policy-report-only");
+        }
+    };
+
+    // https://developers.google.com/analytics/devguides/collection/analyticsjs/cookie-usage?hl=ru#gajs
+    private Set<String> googleCookies = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER) {
+        {
+            add("__utma");
+            add("__utmt");
+            add("__utmb");
+            add("__utmc");
+            add("__utmz");
+            add("__utmv");
+            add("_gat");
+            add("_ga");
+            add("NID");
+        }
+    };
+
+    private Set<String> yandexCookies = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER) {
+        {
+            add("_ym_visorc");
+            add("yabs-sid");
+            add("yandexuid");
         }
     };
 }
