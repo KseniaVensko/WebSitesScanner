@@ -37,7 +37,7 @@ public class Connection implements IConnection {
         this.headers = headers;
     }
 
-    public Map<String, List<String>> getResponseHeaders() throws IOException {
+    public Map<String, List<String>> getResponseHeaders() throws IOException, RuntimeException {
         HttpURLConnection connection = null;
         URL url = host;
 

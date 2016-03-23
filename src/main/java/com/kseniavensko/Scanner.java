@@ -36,13 +36,13 @@ public class Scanner extends Observable implements IScanner {
                 Map<String, List<String>> response = con.getResponseHeaders();
                 // you should call getRedirectedHost after calling getResponseHeaders
                 result.setRedirectedHost(con.getRedirectedHost());
-                responseHeaders = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+                responseHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
                 for (Map.Entry<String, List<String>> entry : response.entrySet()) {
                     if (entry.getKey() != null) {
                         responseHeaders.put(entry.getKey(), entry.getValue());
                     }
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 result.setStringStatus("Connection failed\n");
             }
             if (responseHeaders != null) {
@@ -61,17 +61,22 @@ public class Scanner extends Observable implements IScanner {
     private HashMap<String, Result.Status> parseCookieHeader(List<String> cookies) {
         HashMap<String, Result.Status> result = new HashMap<>();
         if (cookies != null) {
+            PropertiesReader reader = new PropertiesReader();
+            TreeSet<String> metricCookies = new TreeSet<>();
+            try {
+                metricCookies = reader.readCookies();
+            } catch (IOException e) {
+                //TODO - log it
+                e.printStackTrace();
+            }
             for (String cookie : cookies) {
                 Matcher m = cookiePattern.matcher(cookie);
                 if (m.matches()) {
                     String name = m.group(1);
-                    // skip yandex metrika and google analytics
-                    if (googleCookies.contains(name) || yandexCookies.contains(name)) {
+                    if (metricCookies.contains(name)) {
                         continue;
                     }
                 }
-//                if (cookie.toLowerCase().contains("expires") || cookie.toLowerCase().contains("max-age"))       // session cookie doesn`t contain this fields (rfc 6265 4.1.2.2)
-//                    continue;
 
                 if (cookie.toLowerCase().contains("httponly") && cookie.toLowerCase().contains("secure")) {
                     result.put(cookie, Result.Status.Correct);
@@ -157,29 +162,6 @@ public class Scanner extends Observable implements IScanner {
             add("x-version");
             add("x-powered-cms");
             add("content-security-policy-report-only");
-        }
-    };
-
-    // https://developers.google.com/analytics/devguides/collection/analyticsjs/cookie-usage?hl=ru#gajs
-    private Set<String> googleCookies = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER) {
-        {
-            add("__utma");
-            add("__utmt");
-            add("__utmb");
-            add("__utmc");
-            add("__utmz");
-            add("__utmv");
-            add("_gat");
-            add("_ga");
-            add("NID");
-        }
-    };
-
-    private Set<String> yandexCookies = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER) {
-        {
-            add("_ym_visorc");
-            add("yabs-sid");
-            add("yandexuid");
         }
     };
 }
