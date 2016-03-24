@@ -6,18 +6,22 @@ import java.util.regex.Pattern;
 
 public class XXssProtectionValidator implements IHeaderValidator {
     private List<String> values;
-    private Pattern p = Pattern.compile("1; mode=block", Pattern.CASE_INSENSITIVE);
+    private Pattern p = Pattern.compile("\\s*1; mode=block\\s*", Pattern.CASE_INSENSITIVE);
 
     public XXssProtectionValidator(List<String> values) {
         this.values = values;
     }
 
     public boolean valid() {
-        boolean correct = false;
         for (String val : values) {
+            if (val == null) {
+                continue;
+            }
             Matcher m = p.matcher(val);
-            correct |= m.matches();
+            if (m.matches()) {
+                return true;
+            }
         }
-        return correct;
+        return false;
     }
 }

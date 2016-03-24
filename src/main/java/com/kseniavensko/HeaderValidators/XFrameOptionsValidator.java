@@ -14,6 +14,9 @@ public class XFrameOptionsValidator implements IHeaderValidator {
 
     public boolean valid() {
         for (String val : values) {
+            if (val == null) {
+                continue;
+            }
             if (val.contains("allow-from") || val.contains(" *")) return false;
         }
         return true;

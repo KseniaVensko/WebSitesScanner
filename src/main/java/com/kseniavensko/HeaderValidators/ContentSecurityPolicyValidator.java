@@ -21,6 +21,9 @@ public class ContentSecurityPolicyValidator implements IHeaderValidator {
         boolean valid = true;
 
         for (String val : values) {
+            if (val == null) {
+                continue;
+            }
             String[] policyTokens = val.split(";");
 
             for (String token: policyTokens) {

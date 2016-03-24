@@ -8,14 +8,11 @@ import java.util.Map;
 public class Connection implements IConnection {
     private URL host;
     private String redirectedHost;
-    private int port;
-    private MethodEnum method;
     private ProxyType proxyType = null;
-    //private String proxyType = null;
     private String proxyUrl;
     private int proxyPort;
     private Map<String, String> headers;
-    //private URLConnection connection = null;
+    private Logger logger = Logger.getInstance();
 
     public Connection(URL host, Map<String, String> headers) {
         this.host = host;
@@ -29,9 +26,9 @@ public class Connection implements IConnection {
         this.proxyUrl = proxy[0];
         try {
             this.proxyPort = Integer.parseInt(proxy[1]);
-        }
-        catch (Exception e) {
-            // TODO: log this
+        } catch (Exception e) {
+            //TODO standard proxy port to config
+            logger.log("Can not parse proxy port correctly. " + proxyAddr + " Trying to use standard port.");
             this.proxyPort = 80;
         }
         this.headers = headers;
@@ -66,6 +63,7 @@ public class Connection implements IConnection {
                     //url = next.toExternalForm();
                     continue;
             }
+
             break;
         }
         return connection == null ? null : connection.getHeaderFields();
@@ -76,9 +74,8 @@ public class Connection implements IConnection {
             try {
                 Proxy proxy = new Proxy(proxyType.value, new InetSocketAddress(proxyUrl, proxyPort));
                 return host.openConnection(proxy);
-            }
-            catch (IllegalArgumentException e) {
-                // TODO: log this
+            } catch (IllegalArgumentException e) {
+                logger.log("Can not open proxy connection. " + proxyUrl + " Trying to connect without proxy.");
                 host.openConnection();
             }
         }

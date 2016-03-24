@@ -14,24 +14,25 @@ import java.util.regex.Pattern;
 public class Scanner extends Observable implements IScanner {
     private List<Result> results = new ArrayList<Result>();
     private Pattern cookiePattern = Pattern.compile("\\s*([a-zA-Z_0-9-]*)=.*");
+    private Logger logger = Logger.getInstance();
 
     public void scan(List<URL> hosts, String proxy_type, String proxy_addr, Map<String, String> headers, boolean resolveDns) {
         int i = 0;
         int j = hosts.size();
         for (URL host : hosts) {
-          //  IConnection con = new FakeConnection(host, headers);
+            //  IConnection con = new FakeConnection(host, headers);
             IConnection con;
             if (proxy_addr != null && proxy_type != null) {
                 con = new Connection(host, proxy_type, proxy_addr, headers);
-            }
-            else {
+            } else {
                 con = new Connection(host, headers);
             }
             Result result = new Result();
             result.setHost(host);
 
             result.setStringStatus("Connection established\n");
-            Map<String, List<String>> responseHeaders = null;
+
+            Map<String, List<String>> responseHeaders = new TreeMap<>();
             try {
                 Map<String, List<String>> response = con.getResponseHeaders();
                 // you should call getRedirectedHost after calling getResponseHeaders
@@ -42,14 +43,20 @@ public class Scanner extends Observable implements IScanner {
                         responseHeaders.put(entry.getKey(), entry.getValue());
                     }
                 }
-            } catch (Exception e) {
+            } catch (IOException e) {
+                logger.log("Can not read from connection.");
                 result.setStringStatus("Connection failed\n");
+            } catch (RuntimeException e) {
+                //TODO: could this exception be if no proxy?
+                logger.log("Can not open connection to proxy " + proxy_addr);
+                result.setStringStatus("Connection failed\n");
+            } catch (Exception e) {
+                logger.log(e.getMessage());
             }
-            if (responseHeaders != null) {
-                result.setInformationHeaders(parseInformationHeaders(responseHeaders));
-                result.setSecureHeaders(parseSecureHeaders(responseHeaders));
-                result.setSecureCookieFlags(parseCookieHeader(responseHeaders.get("set-cookie")));
-            }
+
+            result.setInformationHeaders(parseInformationHeaders(responseHeaders));
+            result.setSecureHeaders(parseSecureHeaders(responseHeaders));
+            result.setSecureCookieFlags(parseCookieHeader(responseHeaders.get("set-cookie")));
 
             results.add(result);
             i++;
@@ -65,9 +72,8 @@ public class Scanner extends Observable implements IScanner {
             TreeSet<String> metricCookies = new TreeSet<>();
             try {
                 metricCookies = reader.readCookies();
-            } catch (IOException e) {
-                //TODO - log it
-                e.printStackTrace();
+            } catch (Exception e) {
+                logger.log("Can not read metric cookies from property file. Returning empty cookies set.");
             }
             for (String cookie : cookies) {
                 Matcher m = cookiePattern.matcher(cookie);
@@ -78,10 +84,12 @@ public class Scanner extends Observable implements IScanner {
                     }
                 }
 
-                if (cookie.toLowerCase().contains("httponly") && cookie.toLowerCase().contains("secure")) {
-                    result.put(cookie, Result.Status.Correct);
-                } else {
-                    result.put(cookie, Result.Status.Warning);
+                if (cookie != null) {
+                    if (cookie.toLowerCase().contains("httponly") && cookie.toLowerCase().contains("secure")) {
+                        result.put(cookie, Result.Status.Correct);
+                    } else {
+                        result.put(cookie, Result.Status.Warning);
+                    }
                 }
             }
         }
@@ -94,17 +102,18 @@ public class Scanner extends Observable implements IScanner {
 
     private List<Result.Header> parseInformationHeaders(Map<String, List<String>> headers) {
         List<Result.Header> informationHeaderList = new ArrayList<Result.Header>();
-
-        for (String h : informationHeaders) {
-            Result.Header header = new Result().new Header();
-            header.name = h;
-            if (headers != null && headers.containsKey(h)) {
-                header.values = headers.get(h);
-                header.status = Result.Status.Correct;
-            } else {
-                header.status = Result.Status.Missing;
+        if (headers != null) {
+            for (String h : informationHeaders) {
+                Result.Header header = new Result().new Header();
+                header.name = h;
+                if (headers.containsKey(h)) {
+                    header.values = headers.get(h);
+                    header.status = Result.Status.Correct;
+                } else {
+                    header.status = Result.Status.Missing;
+                }
+                informationHeaderList.add(header);
             }
-            informationHeaderList.add(header);
         }
 
         return informationHeaderList;
@@ -124,12 +133,8 @@ public class Scanner extends Observable implements IScanner {
                 try {
                     IHeaderValidator v = (IHeaderValidator) c[0].newInstance(header.values);
                     correct = v.valid();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    logger.log("Something wrong with validator for " + h);
                 }
 
                 header.status = correct ? Result.Status.Correct : Result.Status.Warning;

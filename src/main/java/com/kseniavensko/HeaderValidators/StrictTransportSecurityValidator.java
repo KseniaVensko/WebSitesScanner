@@ -16,11 +16,16 @@ public class StrictTransportSecurityValidator implements IHeaderValidator{
     }
 
     public boolean valid() {
-        boolean correct = false;
         for (String val : values) {
+            if (val == null) {
+                continue;
+            }
             Matcher m = p.matcher(val);
-            correct |= m.matches();
+
+            if (m.matches()) {
+                return true;
+            }
         }
-        return correct;
+        return false;
     }
 }

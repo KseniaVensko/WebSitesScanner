@@ -14,6 +14,9 @@ public class PublicKeyPinsValidator implements IHeaderValidator {
 
     public boolean valid() {
         for (String val : values) {
+            if (val == null) {
+                continue;
+            }
             if (val.toLowerCase().contains("max-age") && val.toLowerCase().contains("pin-sha256"))
                 return true;
         }

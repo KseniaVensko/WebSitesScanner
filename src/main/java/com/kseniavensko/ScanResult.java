@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-//public class ScanResult<T extends Result> extends ArrayList<T> {
 public class ScanResult {
     private List<Result> results;
+    Logger logger = Logger.getInstance();
 
     public ScanResult(List<Result> results) {
         this.results = results;
@@ -24,29 +24,28 @@ public class ScanResult {
             if (result.getRedirectedHost() != null) {
                 resultString.append(" ---> " + result.getRedirectedHost());
             }
-            resultString.append("\n");
-            resultString.append("\n" + result.getStringStatus());
+            resultString.append("\n\n" + result.getStringStatus());
             try {
-                if (result.getInformationHeaders() != null) {
+                if (result.getInformationHeaders() != null && !result.getInformationHeaders().isEmpty()) {
                     resultString.append("\nInformation headers\n");
                     for (Result.Header header : result.getInformationHeaders()) {
                         appendHeader(resultString, header);
                     }
                 }
-                if (result.getSecureHeaders() != null) {
+                if (result.getSecureHeaders() != null && !result.getSecureHeaders().isEmpty()) {
                     resultString.append("\nSecure headers\n");
                     for (Result.Header header : result.getSecureHeaders()) {
                         appendHeader(resultString, header);
                     }
                 }
-                if (result.getSecureCookieFlags() != null) {
+                if (result.getSecureCookieFlags() != null && !result.getSecureCookieFlags().isEmpty()) {
                     resultString.append("\nSession cookies\n");
                     for (Map.Entry<String, Result.Status> sessionCookie : result.getSecureCookieFlags().entrySet()) {
                         resultString.append(sessionCookie.getKey() + " : " + sessionCookie.getValue());
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.log(e.getMessage());
             }
 
             resultString.append("\n\n");
@@ -99,7 +98,7 @@ public class ScanResult {
             fileWriter.flush();
             fileWriter.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log("Error while writing to output file " + file);
         }
     }
 

@@ -3,6 +3,8 @@ package com.kseniavensko;
 import com.beust.jcommander.JCommander;
 import com.kseniavensko.Fakes.FakeScanner;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +15,12 @@ import java.util.Map;
 public class Main {
 
     public static void main(String[] args) {
+        // System.setProperty("sun.net.spi.nameservice.nameservers", "8.8.8.8");
+        // System.setProperty("sun.net.spi.nameservice.provider.1", "dns,sun");
+
+        Logger logger = Logger.getInstance();
         final Arguments jct = new Arguments();
+
         JCommander jcm = new JCommander(jct, args);
         if (jct.help) {
             jcm.usage();
@@ -24,11 +31,22 @@ public class Main {
 
         if (jct.file != null) {
             UrlsReaderFromFile reader = new UrlsReaderFromFile();
-            hosts = reader.read(jct.file);
+            try {
+                hosts = reader.read(jct.file);
+            } catch (FileNotFoundException e) {
+                logger.log("Input file " + jct.file + " was not found.");
+            } catch (IOException e) {
+                logger.log("Can not read from  " + jct.file);
+            }
         }
         // I`ve decided to allow use --host and --input_file together
         if (jct.hosts != null) {
-            hosts.addAll(jct.hosts);
+            try {
+                hosts.addAll(jct.hosts);
+            }
+            catch (Exception e) {
+                logger.log("Can not properly add input hosts to collection to check.");
+            }
         }
 
         final List<URL> finalHosts = hosts;
@@ -39,8 +57,10 @@ public class Main {
         }
 
         for (URL host : finalHosts) {
-            if (host == null)
+            if (host == null) {
+                logger.log("Host is null.");
                 return;
+            }
         }
 
         if (jct.headers != null) {
@@ -61,5 +81,6 @@ public class Main {
         if (jct.json_file != null) {
             result.toJsonFile(jct.json_file);
         }
+        logger.writeToConsole();
     }
 }
