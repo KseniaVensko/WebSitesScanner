@@ -17,7 +17,7 @@ public class Arguments {
             "\t\t\tfor more info see Readme", converter = UrlConverter.class, variableArity = true)
     public List<URL> hosts = new ArrayList<URL>();
 
-    @Parameter(names = "--proxy", description = "IP addr of proxy", converter = ProxyConverter.class)
+    @Parameter(names = "--proxy", description = "IP addr of proxy in format proto://ip:port", converter = ProxyConverter.class)
     ProxyToScan proxy;
 
     @Parameter(names = "--headers", description = "Array of headers separated by commas\n\t\t\tfor more info see Readme", converter = HeadersConverter.class)
@@ -27,7 +27,7 @@ public class Arguments {
             "\t\t\tfor more info see Readme", converter = FileConverter.class)
     File file;
 
-    @Parameter(names = "--output_file", description = "Output file for json format string\n" +
+    @Parameter(names = "--output_file", description = "Output file for json format\n" +
             "\t\t\tfor more info see Readme")
     public String json_file;
 
