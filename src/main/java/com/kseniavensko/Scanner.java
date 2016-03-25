@@ -47,7 +47,6 @@ public class Scanner extends Observable implements IScanner {
                 logger.log("Can not read from connection.");
                 result.setStringStatus("Connection failed\n");
             } catch (RuntimeException e) {
-                //TODO: could this exception be if no proxy?
                 logger.log("Can not open connection to proxy " + proxy.getAddr());
                 result.setStringStatus("Connection failed\n");
             } catch (Exception e) {

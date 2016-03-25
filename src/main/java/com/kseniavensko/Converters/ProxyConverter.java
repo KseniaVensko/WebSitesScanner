@@ -12,8 +12,7 @@ import java.util.regex.Pattern;
  * http://10.0.0.1:8888
  */
 public class ProxyConverter implements IStringConverter<ProxyToScan> {
-    //TODO: upgrade pattern
-    Pattern p = Pattern.compile("(socks|http)\\:\\/\\/([0-9.]+)\\:([0-9]+)");
+    Pattern p = Pattern.compile("(socks|http)\\:\\/\\/((?:[0-9]{1,3}\\.){3}[0-9]{1,3})\\:([0-9]+)");
     Logger logger = Logger.getInstance();
 
     @Override
