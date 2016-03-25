@@ -1,4 +1,4 @@
-java -jar WebSitesScanner [--host url] [--input_file absolute_file_path] [--output_file absolute_file_path.json] [--headers h1:v1, h2:v2, ...]
+java -jar WebSitesScanner [--host url] [--input_file absolute_file_path] [--output_file absolute_file_path.json] [--headers h1:v1&&h2:v2&& ...]
         --host is the url you want to scan
             you can use it any times you want, ex:
             WebSitesScanner --host http://example.com --host http://example2.com
