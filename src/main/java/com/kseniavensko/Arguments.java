@@ -35,5 +35,8 @@ public class Arguments {
 
     @Parameter(names = "--help", help = true)
     public boolean help = false;
+
+    @Parameter(names = "--log", description = "If you want to see log messages")
+    public boolean log = false;
 }
 

@@ -81,6 +81,8 @@ public class Main {
         if (jct.json_file != null) {
             result.toJsonFile(jct.json_file);
         }
-        logger.writeToConsole();
+        if (jct.log) {
+            logger.writeToConsole();
+        }
     }
 }
