@@ -3,6 +3,7 @@ package com.kseniavensko;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.FileConverter;
 import com.kseniavensko.Converters.HeadersConverter;
+import com.kseniavensko.Converters.ProxyConverter;
 import com.kseniavensko.Converters.UrlConverter;
 
 import java.io.File;
@@ -16,11 +17,8 @@ public class Arguments {
             "\t\t\tfor more info see Readme", converter = UrlConverter.class, variableArity = true)
     public List<URL> hosts = new ArrayList<URL>();
 
-    @Parameter(names = "--proxy_type", description = "Type of proxy(http or socks)")
-    public String proxy_type;
-
-    @Parameter(names = "--proxy_addr", description = "IP addr of proxy")
-    String proxy_addr;
+    @Parameter(names = "--proxy", description = "IP addr of proxy", converter = ProxyConverter.class)
+    ProxyToScan proxy;
 
     @Parameter(names = "--headers", description = "Array of headers separated by commas\n\t\t\tfor more info see Readme", converter = HeadersConverter.class)
     public Map<String, String> headers;

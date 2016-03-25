@@ -16,14 +16,14 @@ public class Scanner extends Observable implements IScanner {
     private Pattern cookiePattern = Pattern.compile("\\s*([a-zA-Z_0-9-]*)=.*");
     private Logger logger = Logger.getInstance();
 
-    public void scan(List<URL> hosts, String proxy_type, String proxy_addr, Map<String, String> headers, boolean resolveDns) {
+    public void scan(List<URL> hosts, ProxyToScan proxy, Map<String, String> headers, boolean resolveDns) {
         int i = 0;
         int j = hosts.size();
         for (URL host : hosts) {
             //  IConnection con = new FakeConnection(host, headers);
             IConnection con;
-            if (proxy_addr != null && proxy_type != null) {
-                con = new Connection(host, proxy_type, proxy_addr, headers);
+            if (proxy != null) {
+                con = new Connection(host, proxy, headers);
             } else {
                 con = new Connection(host, headers);
             }
@@ -48,7 +48,7 @@ public class Scanner extends Observable implements IScanner {
                 result.setStringStatus("Connection failed\n");
             } catch (RuntimeException e) {
                 //TODO: could this exception be if no proxy?
-                logger.log("Can not open connection to proxy " + proxy_addr);
+                logger.log("Can not open connection to proxy " + proxy.getAddr());
                 result.setStringStatus("Connection failed\n");
             } catch (Exception e) {
                 logger.log(e.getMessage());

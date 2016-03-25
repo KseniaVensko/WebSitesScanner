@@ -27,7 +27,7 @@ public class Main {
             return;
         }
 
-        List<URL> hosts = new ArrayList<URL>();
+        List<URL> hosts = new ArrayList<>();
 
         if (jct.file != null) {
             UrlsReaderFromFile reader = new UrlsReaderFromFile();
@@ -72,10 +72,15 @@ public class Main {
             }
         }
 
+        if (jct.proxy != null && !jct.proxy.isCorrect()) {
+            System.out.println("Proxy value is not correct. See Readme for proper usage.");
+            return;
+        }
+
         final ProgressObserver ob = new ProgressObserver();
         Scanner scanner = new Scanner();
         scanner.addObserver(ob);
-        scanner.scan(finalHosts, jct.proxy_type, jct.proxy_addr, jct.headers, false);
+        scanner.scan(finalHosts, jct.proxy, jct.headers, false);
         ScanResult result = scanner.returnResults();
         result.toConsole();
         if (jct.json_file != null) {

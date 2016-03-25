@@ -18,6 +18,6 @@ public class Logger {
 
     public void writeToConsole() {
         System.out.println("Errors during scanning:");
-        System.out.println(stringLog.toString());
+        System.out.println(stringLog.toString().isEmpty() ? "none" : stringLog.toString());
     }
 }

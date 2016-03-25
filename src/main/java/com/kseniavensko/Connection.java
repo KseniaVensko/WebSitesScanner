@@ -8,9 +8,7 @@ import java.util.Map;
 public class Connection implements IConnection {
     private URL host;
     private String redirectedHost;
-    private ProxyType proxyType = null;
-    private String proxyUrl;
-    private int proxyPort;
+    private ProxyToScan proxy;
     private Map<String, String> headers;
     private Logger logger = Logger.getInstance();
 
@@ -19,18 +17,9 @@ public class Connection implements IConnection {
         this.headers = headers;
     }
 
-    public Connection(URL host, String proxyType, String proxyAddr, Map<String, String> headers) {
+    public Connection(URL host, ProxyToScan proxy, Map<String, String> headers) {
         this.host = host;
-        this.proxyType = proxyType == "http" ? ProxyType.HTTP : ProxyType.SOCKS;
-        String[] proxy = proxyAddr.split(":", 2);
-        this.proxyUrl = proxy[0];
-        try {
-            this.proxyPort = Integer.parseInt(proxy[1]);
-        } catch (Exception e) {
-            //TODO standard proxy port to config
-            logger.log("Can not parse proxy port correctly. " + proxyAddr + " Trying to use standard port.");
-            this.proxyPort = 80;
-        }
+        this.proxy = proxy;
         this.headers = headers;
     }
 
@@ -70,13 +59,14 @@ public class Connection implements IConnection {
     }
 
     private URLConnection openConnection(URL host) throws IOException {
-        if (proxyType != null) {
+        if (proxy != null) {
             try {
-                Proxy proxy = new Proxy(proxyType.value, new InetSocketAddress(proxyUrl, proxyPort));
-                return host.openConnection(proxy);
+                Proxy.Type proxyType = proxy.getProto() == "http" ? Proxy.Type.HTTP : Proxy.Type.SOCKS;
+                Proxy p = new Proxy(proxyType, new InetSocketAddress(proxy.getAddr(), proxy.getPort()));
+                return host.openConnection(p);
             } catch (IllegalArgumentException e) {
-                logger.log("Can not open proxy connection. " + proxyUrl + " Trying to connect without proxy.");
-                host.openConnection();
+                logger.log("Can not open proxy connection. " + proxy.getAddr() + " Trying to connect without proxy.");
+                return host.openConnection();
             }
         }
         return host.openConnection();
@@ -84,24 +74,6 @@ public class Connection implements IConnection {
 
     public String getRedirectedHost() {
         return redirectedHost;
-    }
-
-    enum MethodEnum {
-        HTTP("http"), HTTPS("https");
-        private String value;
-
-        MethodEnum(String value) {
-            this.value = value;
-        }
-    }
-
-    enum ProxyType {
-        HTTP(Proxy.Type.HTTP), SOCKS(Proxy.Type.HTTP);
-        private Proxy.Type value;
-
-        ProxyType(Proxy.Type value) {
-            this.value = value;
-        }
     }
 
 }
