@@ -1,5 +1,7 @@
 package com.kseniavensko.HeaderValidators;
 
+import com.kseniavensko.ValidationResult;
+
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,16 +14,20 @@ public class XXssProtectionValidator implements IHeaderValidator {
         this.values = values;
     }
 
-    public boolean valid() {
+    public ValidationResult validate() {
+        ValidationResult result = new ValidationResult();
         for (String val : values) {
             if (val == null) {
                 continue;
             }
             Matcher m = p.matcher(val);
             if (m.matches()) {
-                return true;
+                result.setValid(true);
+                return result;
             }
         }
-        return false;
+        result.setValid(false);
+        result.setDetailedInfo("You should use \\'1; mode=block\\' to protect from XSS.");
+        return result;
     }
 }

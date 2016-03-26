@@ -1,5 +1,7 @@
 package com.kseniavensko.HeaderValidators;
 
+import com.kseniavensko.ValidationResult;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,7 +17,8 @@ public class ContentSecurityPolicyValidator implements IHeaderValidator {
         this.values = values;
     }
 
-    public boolean valid() {
+    public ValidationResult validate() {
+        ValidationResult result = new ValidationResult();
         Set<String> directives = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
         // adding additional policies to the list of policies to enforce can only further restrict the capabilities of the protected resource
         boolean valid = true;
@@ -39,12 +42,22 @@ public class ContentSecurityPolicyValidator implements IHeaderValidator {
                 }
             }
         }
-
-        if (!directives.contains("frame-ancestors") || !directives.contains("form-action")) {  //If a frame-ancestors directive is not explicitly included in the policy, then allowed frame ancestors is "*".
-            return false;
+        if (!valid) {
+            result.setValid(false);
+            result.setDetailedInfo("You should not use unsafe-inline and unsafe-eval options(data: equals unsafe-inline, blob: filesystem: equals unsafe-eval).");
         }
 
-        return valid;
+        if (!directives.contains("frame-ancestors") || !directives.contains("form-action")) {  //If a frame-ancestors directive is not explicitly included in the policy, then allowed frame ancestors is "*".
+            result.setDetailedInfo("You should specify frame-ancestors and form-action attribute manually because the default option for them is *");
+            result.setValid(false);
+            return result;
+        }
+
+        if (valid) {
+            result.setValid(true);
+            return result;
+        }
+        return result;
     }
 
     private boolean checkIsValid(String name, String value) {

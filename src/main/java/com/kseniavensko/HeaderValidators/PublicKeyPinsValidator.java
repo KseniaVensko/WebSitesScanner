@@ -1,5 +1,7 @@
 package com.kseniavensko.HeaderValidators;
 
+import com.kseniavensko.ValidationResult;
+
 import java.util.List;
 
 /**
@@ -12,14 +14,19 @@ public class PublicKeyPinsValidator implements IHeaderValidator {
         this.values = values;
     }
 
-    public boolean valid() {
+    public ValidationResult validate() {
+        ValidationResult result = new ValidationResult();
         for (String val : values) {
             if (val == null) {
                 continue;
             }
-            if (val.toLowerCase().contains("max-age") && val.toLowerCase().contains("pin-sha256"))
-                return true;
+            if (val.toLowerCase().contains("max-age") && val.toLowerCase().contains("pin-sha256")) {
+                result.setValid(true);
+                return result;
+            }
         }
-        return false;
+        result.setValid(false);
+        result.setDetailedInfo("Max-age attribute is required and you need to specify at least one pin-sha-256 attribute.");
+        return result;
     }
 }

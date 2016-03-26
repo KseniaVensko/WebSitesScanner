@@ -1,5 +1,7 @@
 package com.kseniavensko.HeaderValidators;
 
+import com.kseniavensko.ValidationResult;
+
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,7 +17,8 @@ public class StrictTransportSecurityValidator implements IHeaderValidator{
         this.values = values;
     }
 
-    public boolean valid() {
+    public ValidationResult validate() {
+        ValidationResult result = new ValidationResult();
         for (String val : values) {
             if (val == null) {
                 continue;
@@ -23,9 +26,12 @@ public class StrictTransportSecurityValidator implements IHeaderValidator{
             Matcher m = p.matcher(val);
 
             if (m.matches()) {
-                return true;
+                result.setValid(true);
+                return result;
             }
         }
-        return false;
+        result.setDetailedInfo("Max-age attribute is required. The proper usage of this header helps defend against MITM attacks and leaking session data.");
+        result.setValid(false);
+        return result;
     }
 }

@@ -1,8 +1,8 @@
 package com.kseniavensko.HeaderValidators;
 
+import com.kseniavensko.ValidationResult;
+
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 public class XFrameOptionsValidator implements IHeaderValidator {
@@ -12,13 +12,19 @@ public class XFrameOptionsValidator implements IHeaderValidator {
         this.values = values;
     }
 
-    public boolean valid() {
+    public ValidationResult validate() {
+        ValidationResult result = new ValidationResult();
         for (String val : values) {
             if (val == null) {
                 continue;
             }
-            if (val.contains("allow-from") || val.contains(" *")) return false;
+            if (val.contains("allow-from") || val.contains(" *")){
+                result.setValid(false);
+                result.setDetailedInfo("It is not recommended to use allow-from and especially pattern * to provide Clickjacking protection");
+                return result;
+            }
         }
-        return true;
+        result.setValid(true);
+        return result;
     }
 }

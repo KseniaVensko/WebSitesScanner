@@ -61,6 +61,7 @@ public class Result {
     }
 
     public void setRedirectedHost(String redirectedHost) {
+        //TODO: more beauty, please
         this.redirectedHost = redirectedHost;
     }
 
@@ -72,5 +73,6 @@ public class Result {
         Status status;
         String name;
         List<String> values;
+        String detailedInfo;
     }
 }

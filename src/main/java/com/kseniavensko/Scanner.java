@@ -1,11 +1,9 @@
 package com.kseniavensko;
 
-import com.kseniavensko.Fakes.FakeConnection;
 import com.kseniavensko.HeaderValidators.*;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -126,17 +124,18 @@ public class Scanner extends Observable implements IScanner {
             header.name = h;
             if (headers != null && headers.containsKey(h)) {
                 header.values = headers.get(h);
-                boolean correct = false;
+                ValidationResult result = new ValidationResult();
 
                 Constructor<?>[] c = recommendedSecureHeaders.get(h).getConstructors();
                 try {
                     IHeaderValidator v = (IHeaderValidator) c[0].newInstance(header.values);
-                    correct = v.valid();
+                    result = v.validate();
                 } catch (Exception e) {
                     logger.log("Something wrong with validator for " + h);
                 }
 
-                header.status = correct ? Result.Status.Correct : Result.Status.Warning;
+                header.status = result.isValid() ? Result.Status.Correct : Result.Status.Warning;
+                header.detailedInfo = result.getDetailedInfo();
             } else {
                 header.status = Result.Status.Missing;
             }

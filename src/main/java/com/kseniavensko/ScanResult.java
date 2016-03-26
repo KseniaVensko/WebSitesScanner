@@ -1,5 +1,7 @@
 package com.kseniavensko;
 
+import com.inamik.utils.SimpleTableFormatter;
+import com.inamik.utils.TableFormatter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -18,37 +20,42 @@ public class ScanResult {
 
     public void toConsole() {
         // TODO: j-text-utils
+
         StringBuilder resultString = new StringBuilder();
         for (Result result : results) {
-            resultString.append("\n" + result.getHost().toString());
+            System.out.print("\n" + result.getHost().toString());
             if (result.getRedirectedHost() != null) {
-                resultString.append(" ---> " + result.getRedirectedHost());
+                System.out.println(" ---> " + result.getRedirectedHost());
             }
-            resultString.append("\n\n" + result.getStringStatus());
+            System.out.println(result.getStringStatus());
             try {
                 if (result.getInformationHeaders() != null && !result.getInformationHeaders().isEmpty()) {
-                    resultString.append("\nInformation headers\n");
+                    System.out.println("Information headers");
+                    TableFormatter tf = tableWithHat();
                     for (Result.Header header : result.getInformationHeaders()) {
-                        appendHeader(resultString, header);
+                        appendHeader(tf, header);
                     }
+                    printTable(tf);
                 }
                 if (result.getSecureHeaders() != null && !result.getSecureHeaders().isEmpty()) {
-                    resultString.append("\nSecure headers\n");
+                    System.out.println("\nSecurity headers");
+                    TableFormatter tf = tableWithHat();
                     for (Result.Header header : result.getSecureHeaders()) {
-                        appendHeader(resultString, header);
+                        appendHeader(tf, header);
                     }
+                    printTable(tf);
                 }
                 if (result.getSecureCookieFlags() != null && !result.getSecureCookieFlags().isEmpty()) {
-                    resultString.append("\nSession cookies\n");
+                    System.out.println("\nSession cookies");
                     for (Map.Entry<String, Result.Status> sessionCookie : result.getSecureCookieFlags().entrySet()) {
-                        resultString.append(sessionCookie.getKey() + " : " + sessionCookie.getValue());
+                        System.out.println(sessionCookie.getKey() + " : " + sessionCookie.getValue());
                     }
                 }
             } catch (Exception e) {
                 logger.log(e.getMessage());
             }
 
-            resultString.append("\n\n");
+            System.out.println();
         }
         System.out.println(resultString.toString());
     }
@@ -85,8 +92,7 @@ public class ScanResult {
             }
             if (result.getRedirectedHost() != null) {
                 hosts.put(result.getHost().toString() + " ---> " + result.getRedirectedHost(), options);
-            }
-            else {
+            } else {
                 hosts.put(result.getHost().toString(), options);
             }
         }
@@ -102,15 +108,33 @@ public class ScanResult {
         }
     }
 
-    private void appendHeader(StringBuilder resultString, Result.Header header) {
-        resultString.append(header.name + " : ");
-        resultString.append(header.status.toString());
+    private void appendHeader(TableFormatter tf, Result.Header header) {
+        tf.nextRow().nextCell(TableFormatter.ALIGN_LEFT, TableFormatter.VALIGN_CENTER)
+                .addLine(header.name)
+                .nextCell(TableFormatter.ALIGN_LEFT, TableFormatter.VALIGN_CENTER);
         if (header.status != Result.Status.Missing) {
             for (String value : header.values) {
-                resultString.append("\n\t" + value);
+                if (value.length() > 35) {
+                    for (String s : value.split("(?<=\\G.{35})")) {
+                        tf.addLine(s);
+                    }
+                }
+                else {
+                    tf.addLine(value);
+                }
             }
         }
-        resultString.append("\n");
+        tf.nextCell(TableFormatter.ALIGN_LEFT, TableFormatter.VALIGN_CENTER)
+                .addLine(header.status.toString())
+                .nextCell(TableFormatter.ALIGN_LEFT, TableFormatter.VALIGN_CENTER);
+        if (header.detailedInfo != null && header.detailedInfo.length() > 35) {
+            for (String s : header.detailedInfo.split("(?<=\\G.{35})")) {
+                tf.addLine(s);
+            }
+        }
+        else {
+            tf.addLine(header.detailedInfo);
+        }
     }
 
     private void addHeaderObject(JSONObject headers, Result.Header h) {
@@ -124,7 +148,29 @@ public class ScanResult {
             header.put("values", values);
         }
         header.put("status", h.status.toString());
+        header.put("detailed_info", h.detailedInfo);
 
         headers.put(h.name, header);
+    }
+
+    private TableFormatter tableWithHat() {
+        TableFormatter tf = new SimpleTableFormatter(true);
+        tf.nextRow().nextCell(TableFormatter.ALIGN_CENTER, TableFormatter.VALIGN_CENTER)
+                .addLine("header")
+                .nextCell(TableFormatter.ALIGN_CENTER, TableFormatter.VALIGN_CENTER)
+                .addLine("value")
+                .nextCell(TableFormatter.ALIGN_CENTER, TableFormatter.VALIGN_CENTER)
+                .addLine("correctness")
+                .nextCell(TableFormatter.ALIGN_CENTER, TableFormatter.VALIGN_CENTER)
+                .addLine("description");
+        return tf;
+    }
+
+    private void printTable(TableFormatter tf) {
+        String[] table = tf.getFormattedTable();
+
+        for (int i = 0, size = table.length; i < size; i++) {
+            System.out.println( "\t" + table[i]);
+        }
     }
 }
