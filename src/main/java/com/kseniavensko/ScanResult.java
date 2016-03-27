@@ -19,9 +19,6 @@ public class ScanResult {
     }
 
     public void toConsole() {
-        // TODO: j-text-utils
-
-        StringBuilder resultString = new StringBuilder();
         for (Result result : results) {
             System.out.print("\n" + result.getHost().toString());
             if (result.getRedirectedHost() != null) {
@@ -57,7 +54,6 @@ public class ScanResult {
 
             System.out.println();
         }
-        System.out.println(resultString.toString());
     }
 
     public void toJsonFile(String file) {

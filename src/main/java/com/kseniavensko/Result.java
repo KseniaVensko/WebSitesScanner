@@ -66,7 +66,7 @@ public class Result {
     }
 
     enum Status {
-        Correct, Missing, Warning
+        Correct, Missing, Warning, Exists
     }
 
     class Header {

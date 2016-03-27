@@ -105,7 +105,7 @@ public class Scanner extends Observable implements IScanner {
                 header.name = h;
                 if (headers.containsKey(h)) {
                     header.values = headers.get(h);
-                    header.status = Result.Status.Correct;
+                    header.status = Result.Status.Exists;
                 } else {
                     header.status = Result.Status.Missing;
                 }
@@ -147,24 +147,24 @@ public class Scanner extends Observable implements IScanner {
 
     private HashMap<String, Class<? extends IHeaderValidator>> recommendedSecureHeaders = new HashMap<String, Class<? extends IHeaderValidator>>() {
         {
-            put("public-key-pins", PublicKeyPinsValidator.class);
-            put("strict-transport-security", StrictTransportSecurityValidator.class);
-            put("x-frame-options", XFrameOptionsValidator.class);
-            put("x-xss-protection", XXssProtectionValidator.class);
-            put("x-content-type-options", XContentTypeOptionsValidator.class);
-            put("content-security-policy", ContentSecurityPolicyValidator.class);
+            put("Public-Key-Pins", PublicKeyPinsValidator.class);
+            put("Strict-Transport-Security", StrictTransportSecurityValidator.class);
+            put("X-Frame-Options", XFrameOptionsValidator.class);
+            put("X-Xss-Protection", XXssProtectionValidator.class);
+            put("X-Content-Type-Options", XContentTypeOptionsValidator.class);
+            put("Content-Security-Policy", ContentSecurityPolicyValidator.class);
         }
     };
 
     private ArrayList<String> informationHeaders = new ArrayList<String>() {
         {
-            add("server");
-            add("x-powered-by");
-            add("x-aspnet-version");
-            add("x-runtime");
-            add("x-version");
-            add("x-powered-cms");
-            add("content-security-policy-report-only");
+            add("Server");
+            add("X-Powered-By");
+            add("X-Aspnet-Version");
+            add("X-Runtime");
+            add("X-Version");
+            add("X-Powered-Cms");
+            add("Content-Security-Policy-Report-Only");
         }
     };
 }
