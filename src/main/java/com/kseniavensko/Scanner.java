@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class Scanner extends Observable implements IScanner {
     private List<Result> results = new ArrayList<Result>();
-    private Pattern cookiePattern = Pattern.compile("\\s*([a-zA-Z_0-9-]*)=.*");
+    private Pattern cookiePattern = Pattern.compile("\\s*([^()<>@,;:\\\"\\/\\[\\]?={}]*)=(.*?);.*");
     private Logger logger = Logger.getInstance();
 
     public void scan(List<URL> hosts, ProxyToScan proxy, Map<String, String> headers, boolean resolveDns) {
@@ -28,7 +28,7 @@ public class Scanner extends Observable implements IScanner {
             Result result = new Result();
             result.setHost(host);
 
-            result.setStringStatus("Connection established\n");
+            result.setStringStatus("\nConnection established\n");
 
             Map<String, List<String>> responseHeaders = new TreeMap<>();
             try {
@@ -53,7 +53,7 @@ public class Scanner extends Observable implements IScanner {
 
             result.setInformationHeaders(parseInformationHeaders(responseHeaders));
             result.setSecureHeaders(parseSecureHeaders(responseHeaders));
-            result.setSecureCookieFlags(parseCookieHeader(responseHeaders.get("set-cookie")));
+            result.setSecureCookies(parseCookieHeader(responseHeaders.get("set-cookie")));
 
             results.add(result);
             i++;
@@ -62,8 +62,8 @@ public class Scanner extends Observable implements IScanner {
         }
     }
 
-    private HashMap<String, Result.Status> parseCookieHeader(List<String> cookies) {
-        HashMap<String, Result.Status> result = new HashMap<>();
+    private List<Result.Cookie> parseCookieHeader(List<String> cookies) {
+        List<Result.Cookie> result = new ArrayList<>();
         if (cookies != null) {
             PropertiesReader reader = new PropertiesReader();
             TreeSet<String> metricCookies = new TreeSet<>();
@@ -73,19 +73,32 @@ public class Scanner extends Observable implements IScanner {
                 logger.log("Can not read metric cookies from property file. Returning empty cookies set.");
             }
             for (String cookie : cookies) {
-                Matcher m = cookiePattern.matcher(cookie);
-                if (m.matches()) {
-                    String name = m.group(1);
-                    if (metricCookies.contains(name)) {
-                        continue;
-                    }
-                }
-
                 if (cookie != null) {
-                    if (cookie.toLowerCase().contains("httponly") && cookie.toLowerCase().contains("secure")) {
-                        result.put(cookie, Result.Status.Correct);
-                    } else {
-                        result.put(cookie, Result.Status.Warning);
+                    Matcher m = cookiePattern.matcher(cookie);
+                    String name, value;
+                    Result.Cookie c = new Result().new Cookie();
+                    if (m.matches()) {
+                        c.name = m.group(1);
+                        //TODO: index of bound
+                        c.value = m.group(2);
+                        if (metricCookies.contains(c.name)) {
+                            continue;
+                        }
+                        if (cookie.toLowerCase().contains("httponly") && cookie.toLowerCase().contains("secure")) {
+                            c.status = Result.Status.Correct;
+                            result.add(c);
+                        } else {
+                            c.status = Result.Status.Warning;
+                            c.detailedInfo = "Cookie should contain flags httponly and secure";
+                            result.add(c);
+                        }
+                    }
+                    else {
+                        c.name = "";
+                        c.value = cookie;
+                        c.status = Result.Status.Warning;
+                        c.detailedInfo = "Can not parse this cookie. Maybe it is not correct.";
+                        result.add(c);
                     }
                 }
             }

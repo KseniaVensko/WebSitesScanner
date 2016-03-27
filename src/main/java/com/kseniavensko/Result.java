@@ -10,7 +10,7 @@ public class Result {
     private URL host;
     private String redirectedHost;
     private List<Header> secureHeaders;
-    private Map<String, Status> secureCookieFlags;
+    private List<Cookie> secureCookies;
     private List<Header> informationHeaders;
     private String stringStatus;
 
@@ -48,14 +48,6 @@ public class Result {
         this.informationHeaders = informationHeaders;
     }
 
-    public Map<String, Status> getSecureCookieFlags() {
-        return secureCookieFlags;
-    }
-
-    public void setSecureCookieFlags(Map<String, Status> secureCookieFlags) {
-        this.secureCookieFlags = secureCookieFlags;
-    }
-
     public String getRedirectedHost() {
         return redirectedHost;
     }
@@ -63,6 +55,14 @@ public class Result {
     public void setRedirectedHost(String redirectedHost) {
         //TODO: more beauty, please
         this.redirectedHost = redirectedHost;
+    }
+
+    public List<Cookie> getSecureCookies() {
+        return secureCookies;
+    }
+
+    public void setSecureCookies(List<Cookie> secureCookies) {
+        this.secureCookies = secureCookies;
     }
 
     enum Status {
@@ -73,6 +73,13 @@ public class Result {
         Status status;
         String name;
         List<String> values;
+        String detailedInfo;
+    }
+
+    class Cookie {
+        Status status;
+        String name;
+        String value;
         String detailedInfo;
     }
 }

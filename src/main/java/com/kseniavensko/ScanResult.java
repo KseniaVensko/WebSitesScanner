@@ -28,7 +28,7 @@ public class ScanResult {
             try {
                 if (result.getInformationHeaders() != null && !result.getInformationHeaders().isEmpty()) {
                     System.out.println("Information headers");
-                    TableFormatter tf = tableWithHat();
+                    TableFormatter tf = tableWithHat("header");
                     for (Result.Header header : result.getInformationHeaders()) {
                         appendHeader(tf, header);
                     }
@@ -36,17 +36,20 @@ public class ScanResult {
                 }
                 if (result.getSecureHeaders() != null && !result.getSecureHeaders().isEmpty()) {
                     System.out.println("\nSecurity headers");
-                    TableFormatter tf = tableWithHat();
+                    TableFormatter tf = tableWithHat("header");
                     for (Result.Header header : result.getSecureHeaders()) {
                         appendHeader(tf, header);
                     }
                     printTable(tf);
                 }
-                if (result.getSecureCookieFlags() != null && !result.getSecureCookieFlags().isEmpty()) {
+                if (result.getSecureCookies() != null && !result.getSecureCookies().isEmpty()) {
                     System.out.println("\nSession cookies");
-                    for (Map.Entry<String, Result.Status> sessionCookie : result.getSecureCookieFlags().entrySet()) {
-                        System.out.println(sessionCookie.getKey() + " : " + sessionCookie.getValue());
+                    TableFormatter tf = tableWithHat("cookie");
+
+                    for (Result.Cookie cookie : result.getSecureCookies()) {
+                        appendCookie(tf, cookie);
                     }
+                    printTable(tf);
                 }
             } catch (Exception e) {
                 logger.log(e.getMessage());
@@ -80,17 +83,17 @@ public class ScanResult {
             options.put("secure_headers", secureHeaders);
 
             JSONObject sessionCookies = new JSONObject();
-            if (result.getSecureCookieFlags() != null) {
-                for (Map.Entry<String, Result.Status> sessionCookie : result.getSecureCookieFlags().entrySet()) {
-                    sessionCookies.put(sessionCookie.getKey(), sessionCookie.getValue().toString());
+            if (result.getSecureCookies() != null && !result.getSecureCookies().isEmpty()) {
+                for (Result.Cookie cookie : result.getSecureCookies()) {
+                    JSONObject cookieObject = new JSONObject();
+                    cookieObject.put("value", cookie.value);
+                    cookieObject.put("status", cookie.status.toString());
+                    cookieObject.put("detaledInfo", cookie.detailedInfo == null ? "" : cookie.detailedInfo);
+                    sessionCookies.put(cookie.name, cookieObject);
                 }
                 options.put("session_cookies", sessionCookies);
             }
-            if (result.getRedirectedHost() != null) {
-                hosts.put(result.getHost().toString() + " ---> " + result.getRedirectedHost(), options);
-            } else {
-                hosts.put(result.getHost().toString(), options);
-            }
+            hosts.put(result.getHost().getAuthority(), options);
         }
 
         try {
@@ -104,32 +107,33 @@ public class ScanResult {
         }
     }
 
+    private void appendCookie(TableFormatter tf, Result.Cookie cookie) {
+        tf.nextRow().nextCell(TableFormatter.ALIGN_LEFT, TableFormatter.VALIGN_CENTER)
+                .addLine(cookie.name)
+                .nextCell(TableFormatter.ALIGN_LEFT, TableFormatter.VALIGN_CENTER);
+        addLinesToCell(tf, cookie.value);
+        tf.nextCell(TableFormatter.ALIGN_LEFT, TableFormatter.VALIGN_CENTER)
+                .addLine(cookie.status.toString())
+                .nextCell(TableFormatter.ALIGN_LEFT, TableFormatter.VALIGN_CENTER);
+        if (cookie.detailedInfo != null) {
+            addLinesToCell(tf, cookie.detailedInfo);
+        }
+    }
+
     private void appendHeader(TableFormatter tf, Result.Header header) {
         tf.nextRow().nextCell(TableFormatter.ALIGN_LEFT, TableFormatter.VALIGN_CENTER)
                 .addLine(header.name)
                 .nextCell(TableFormatter.ALIGN_LEFT, TableFormatter.VALIGN_CENTER);
         if (header.status != Result.Status.Missing) {
             for (String value : header.values) {
-                if (value.length() > 35) {
-                    for (String s : value.split("(?<=\\G.{35})")) {
-                        tf.addLine(s);
-                    }
-                }
-                else {
-                    tf.addLine(value);
-                }
+                addLinesToCell(tf, value);
             }
         }
         tf.nextCell(TableFormatter.ALIGN_LEFT, TableFormatter.VALIGN_CENTER)
                 .addLine(header.status.toString())
                 .nextCell(TableFormatter.ALIGN_LEFT, TableFormatter.VALIGN_CENTER);
-        if (header.detailedInfo != null && header.detailedInfo.length() > 35) {
-            for (String s : header.detailedInfo.split("(?<=\\G.{35})")) {
-                tf.addLine(s);
-            }
-        }
-        else {
-            tf.addLine(header.detailedInfo);
+        if (header.detailedInfo != null) {
+            addLinesToCell(tf, header.detailedInfo);
         }
     }
 
@@ -149,10 +153,10 @@ public class ScanResult {
         headers.put(h.name, header);
     }
 
-    private TableFormatter tableWithHat() {
+    private TableFormatter tableWithHat(String first) {
         TableFormatter tf = new SimpleTableFormatter(true);
         tf.nextRow().nextCell(TableFormatter.ALIGN_CENTER, TableFormatter.VALIGN_CENTER)
-                .addLine("header")
+                .addLine(first)
                 .nextCell(TableFormatter.ALIGN_CENTER, TableFormatter.VALIGN_CENTER)
                 .addLine("value")
                 .nextCell(TableFormatter.ALIGN_CENTER, TableFormatter.VALIGN_CENTER)
@@ -166,7 +170,17 @@ public class ScanResult {
         String[] table = tf.getFormattedTable();
 
         for (int i = 0, size = table.length; i < size; i++) {
-            System.out.println( "\t" + table[i]);
+            System.out.println("\t" + table[i]);
+        }
+    }
+
+    private void addLinesToCell(TableFormatter tf, String value) {
+        if (value.length() > 35) {
+            for (String s : value.split("(?<=\\G.{35})")) {
+                tf.addLine(s);
+            }
+        } else {
+            tf.addLine(value);
         }
     }
 }
