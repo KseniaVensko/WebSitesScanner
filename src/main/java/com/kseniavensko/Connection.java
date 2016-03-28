@@ -63,7 +63,7 @@ public class Connection implements IConnection {
     private URLConnection openConnection(URL host) throws IOException {
         if (proxy != null) {
             try {
-                Proxy.Type proxyType = proxy.getProto() == "http" ? Proxy.Type.HTTP : Proxy.Type.SOCKS;
+                Proxy.Type proxyType = proxy.getProto().equalsIgnoreCase("http") ? Proxy.Type.HTTP : Proxy.Type.SOCKS;
                 Proxy p = new Proxy(proxyType, new InetSocketAddress(proxy.getAddr(), proxy.getPort()));
                 return host.openConnection(p);
             } catch (IllegalArgumentException e) {
