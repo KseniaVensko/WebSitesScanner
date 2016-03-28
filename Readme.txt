@@ -1,4 +1,4 @@
-Program sends request to the servers and analyse response headers nad prints results and recommendations. To use it you need Java8 or higher.
+Program sends request to the servers and analyse response headers and prints results and recommendations. To use it you need Java8 or higher.
 
 Usage:
 java -jar WebSitesScanner [--host url] [--input_file path] [--output_file path] [--headers headers_with_values] [--proxy proxy_url]
