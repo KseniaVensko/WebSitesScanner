@@ -53,7 +53,6 @@ public class Result {
     }
 
     public void setRedirectedHost(String redirectedHost) {
-        //TODO: more beauty, please
         this.redirectedHost = redirectedHost;
     }
 

@@ -45,14 +45,16 @@ public class Connection implements IConnection {
 //          URL base, next;
             int responseCode = connection.getResponseCode();
             if (String.valueOf(responseCode).matches("3[0-9]{2}")) {
-                //TODO: not all redirects contains Location
-                redirectedHost.append(connection.getHeaderField("Location"));
-                url = new URL(redirectedHost.toString());
-                redirectedHost.append(" with " + responseCode + " code, ");
-                //base = new URL(url.toString());
-                //next = new URL(base, location);  // Deal with relative URLs
-                //url = next.toExternalForm();
-                continue;
+                String location = connection.getHeaderField("Location");
+                if (location != null) {
+                    redirectedHost.append(location);
+                    url = new URL(redirectedHost.toString());
+                    redirectedHost.append(" with " + responseCode + " code, ");
+                    //base = new URL(url.toString());
+                    //next = new URL(base, location);  // Deal with relative URLs
+                    //url = next.toExternalForm();
+                    continue;
+                }
             }
             //TODO: do I need to do the second request to the server?
             redirectedHost.append("code " + responseCode + " " + connection.getResponseMessage() + ",");
