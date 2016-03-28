@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class Scanner extends Observable implements IScanner {
     private List<Result> results = new ArrayList<Result>();
-    private Pattern cookiePattern = Pattern.compile("\\s*([^()<>@,;:\\\"\\/\\[\\]?={}]*)=(.*?);.*");
+    private Pattern cookiePattern = Pattern.compile("\\s*([^()<>@,;:\\\"\\/\\[\\]?={}]*)=(.*?);(.*)");
     private Logger logger = Logger.getInstance();
 
     public void scan(List<URL> hosts, ProxyToScan proxy, Map<String, String> headers, boolean resolveDns) {
@@ -75,22 +75,27 @@ public class Scanner extends Observable implements IScanner {
             for (String cookie : cookies) {
                 if (cookie != null) {
                     Matcher m = cookiePattern.matcher(cookie);
-                    String name, value;
                     Result.Cookie c = new Result().new Cookie();
                     if (m.matches()) {
                         c.name = m.group(1);
                         c.value = m.group(2);
+                        String flags = m.group(3);
                         if (metricCookies.contains(c.name)) {
                             continue;
                         }
-                        if (cookie.toLowerCase().contains("httponly") && cookie.toLowerCase().contains("secure")) {
+                        if (flags.toLowerCase().contains("httponly") && flags.toLowerCase().contains("secure")) {
                             c.status = Result.Status.Correct;
-                            result.add(c);
                         } else {
                             c.status = Result.Status.Warning;
                             c.detailedInfo = "Cookie should contain flags httponly and secure";
-                            result.add(c);
                         }
+                        if (flags.toLowerCase().contains("httponly")) {
+                            c.value += "; httponly";
+                        }
+                        if (flags.toLowerCase().contains("secure")) {
+                            c.value += "; secure";
+                        }
+                        result.add(c);
                     }
                     else {
                         c.name = "";

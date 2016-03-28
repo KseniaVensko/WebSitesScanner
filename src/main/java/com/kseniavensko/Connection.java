@@ -45,6 +45,7 @@ public class Connection implements IConnection {
 //          URL base, next;
             int responseCode = connection.getResponseCode();
             if (String.valueOf(responseCode).matches("3[0-9]{2}")) {
+                //TODO: not all redirects contains Location
                 redirectedHost.append(connection.getHeaderField("Location"));
                 url = new URL(redirectedHost.toString());
                 redirectedHost.append(" with " + responseCode + " code, ");
