@@ -23,12 +23,12 @@ Options:
 
         --headers headers_with_values
             Specify the hash of headers with values you want to send additionally to standard headers during scanning, not required.
-            It looks like [header_object]&&[header_object]&&... Note that string must not contain spaces before and after &&.
-            where [header_object] consist name and value of header separeted by colon, ex:
+            It must be like [header_object]&&[header_object]&&...
+            where [header_object] consist name and value of header separeted by colon. Note that string must not contain spaces before and after &&, ex:
             WebSitesScanner --input_file hosts.txt --headers "User-Agent":"Mozilla/5.0"&&Referer:"http://www.example.com/"
 
         --log
-            Force program to display warnings and errors to console during scanning
+            Force program to display warnings and errors to the console during scanning
 
         --help
             Prints help message and quits
@@ -41,8 +41,8 @@ Options:
 
 Examples:
 * java -jar WebSitesScanner.jar --input_file input.txt --headers "User-Agent":"Mozilla/5.0 (Windows NT 6.3; WOW64; rv:36.0) Gecko/20100101 Firefox/36.0" --proxy socks://127.0.0.0:9150
-        program will read URLs from input.txt, send requests to that URLs with specified User-Agent header through specified socks proxy and prints results to the console.
+        program will read URLs from input.txt, send requests to that URLs with specified User-Agent header through specified socks proxy and print results to the console.
 
 * java -jar WebSitesScanner.jar --host facebook.com --input_file input2.txt --output_file out.json --log --proxy http://127.0.0.1:8888
         program will read URLs from input.txt, send requests to that URLs and specified URL facebook.com through http proxy,
-        prints results to the console and to the out.json file, prints errors and warnings during scanning to the console.
+        print results to the console and to the out.json file, print errors and warnings during scanning to the console.
