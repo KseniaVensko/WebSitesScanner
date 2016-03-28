@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.*;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class Connection implements IConnection {
     private URL host;
@@ -11,6 +12,7 @@ public class Connection implements IConnection {
     private ProxyToScan proxy;
     private Map<String, String> headers;
     private Logger logger = Logger.getInstance();
+    private Pattern code = Pattern.compile("3[0-9]{2}");
 
     public Connection(URL host, Map<String, String> headers) {
         this.host = host;
@@ -42,18 +44,17 @@ public class Connection implements IConnection {
             }
 //          URL base, next;
             int responseCode = connection.getResponseCode();
-            switch (responseCode) {
-                case HttpURLConnection.HTTP_MOVED_PERM:
-                case HttpURLConnection.HTTP_MOVED_TEMP:
-                    redirectedHost.append(connection.getHeaderField("Location"));
-                    url = new URL(redirectedHost.toString());
-                    redirectedHost.append(" with " + responseCode + " code, ");
-                    //base = new URL(url.toString());
-                    //next = new URL(base, location);  // Deal with relative URLs
-                    //url = next.toExternalForm();
-                    continue;
+            if (String.valueOf(responseCode).matches("3[0-9]{2}")) {
+                redirectedHost.append(connection.getHeaderField("Location"));
+                url = new URL(redirectedHost.toString());
+                redirectedHost.append(" with " + responseCode + " code, ");
+                //base = new URL(url.toString());
+                //next = new URL(base, location);  // Deal with relative URLs
+                //url = next.toExternalForm();
+                continue;
             }
-
+            //TODO: do I need to do the second request to the server?
+            redirectedHost.append("code " + responseCode + " " + connection.getResponseMessage() + ",");
             break;
         }
         return connection == null ? null : connection.getHeaderFields();
