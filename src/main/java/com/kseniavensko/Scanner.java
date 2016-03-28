@@ -14,7 +14,7 @@ public class Scanner extends Observable implements IScanner {
     private Pattern cookiePattern = Pattern.compile("\\s*([^()<>@,;:\\\"\\/\\[\\]?={}]*)=(.*?);(.*)");
     private Logger logger = Logger.getInstance();
 
-    public void scan(List<URL> hosts, ProxyToScan proxy, Map<String, String> headers, boolean resolveDns) {
+    public void scan(List<URL> hosts, ProxyToScan proxy, List<HeaderArgument> headers, boolean resolveDns) {
         int i = 0;
         int j = hosts.size();
         for (URL host : hosts) {

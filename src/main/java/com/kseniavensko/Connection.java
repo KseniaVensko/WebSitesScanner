@@ -4,22 +4,20 @@ import java.io.IOException;
 import java.net.*;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public class Connection implements IConnection {
     private URL host;
     private StringBuilder redirectedHost = new StringBuilder();
     private ProxyToScan proxy;
-    private Map<String, String> headers;
+    private List<HeaderArgument> headers;
     private Logger logger = Logger.getInstance();
-    private Pattern code = Pattern.compile("3[0-9]{2}");
 
-    public Connection(URL host, Map<String, String> headers) {
+    public Connection(URL host, List<HeaderArgument> headers) {
         this.host = host;
         this.headers = headers;
     }
 
-    public Connection(URL host, ProxyToScan proxy, Map<String, String> headers) {
+    public Connection(URL host, ProxyToScan proxy, List<HeaderArgument> headers) {
         this.host = host;
         this.proxy = proxy;
         this.headers = headers;
@@ -38,8 +36,8 @@ public class Connection implements IConnection {
             connection.setInstanceFollowRedirects(false);   // Make the logic below easier to detect redirections
 
             if (headers != null) {
-                for (Map.Entry<String, String> entry : headers.entrySet()) {
-                    connection.setRequestProperty(entry.getKey(), entry.getValue());
+                for (HeaderArgument header : headers) {
+                    connection.setRequestProperty(header.name, header.value);
                 }
             }
 //          URL base, next;

@@ -1,7 +1,6 @@
 package com.kseniavensko;
 
 import com.beust.jcommander.JCommander;
-import com.kseniavensko.Fakes.FakeScanner;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -64,9 +63,9 @@ public class Main {
         }
 
         if (jct.headers != null) {
-            for (Map.Entry<String, String> val : jct.headers.entrySet()) {
-                if (val.getValue() == null) {
-                    System.out.println("header value is not correct for header : " + val.getKey());
+            for (HeaderArgument header : jct.headers) {
+                if (header.value == null) {
+                    System.out.println("header value is not correct for header : " + header.name);
                     return;
                 }
             }
@@ -86,7 +85,7 @@ public class Main {
         if (jct.json_file != null) {
             result.toJsonFile(jct.json_file);
         }
-        if (jct.log) {
+        if (jct.verbose) {
             logger.writeToConsole();
         }
     }
