@@ -1,7 +1,10 @@
 package com.kseniavensko;
 
+import com.kseniavensko.Converters.UrlConverter;
+
 import java.io.*;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,11 +13,12 @@ public class UrlsReaderFromFile {
         List<URL> hosts = new ArrayList<URL>();
 
         FileReader r = new FileReader(file);
+        UrlConverter c = new UrlConverter();
         try {
             BufferedReader br = new BufferedReader(r);
             String line;
             while ((line = br.readLine()) != null) {
-                hosts.add(new URL(line));
+                hosts.add(c.convert(line));
             }
 
         } catch (IOException e) {
