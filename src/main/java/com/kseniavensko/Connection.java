@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class Connection implements IConnection {
     private URL host;
-    private String redirectedHost;
+    private StringBuilder redirectedHost = new StringBuilder();
     private ProxyToScan proxy;
     private Map<String, String> headers;
     private Logger logger = Logger.getInstance();
@@ -41,12 +41,13 @@ public class Connection implements IConnection {
                 }
             }
 //          URL base, next;
-
-            switch (connection.getResponseCode()) {
+            int responseCode = connection.getResponseCode();
+            switch (responseCode) {
                 case HttpURLConnection.HTTP_MOVED_PERM:
                 case HttpURLConnection.HTTP_MOVED_TEMP:
-                    redirectedHost = connection.getHeaderField("Location");
-                    url = new URL(redirectedHost);
+                    redirectedHost.append(connection.getHeaderField("Location"));
+                    url = new URL(redirectedHost.toString());
+                    redirectedHost.append(" with " + responseCode + " code, ");
                     //base = new URL(url.toString());
                     //next = new URL(base, location);  // Deal with relative URLs
                     //url = next.toExternalForm();
@@ -73,7 +74,7 @@ public class Connection implements IConnection {
     }
 
     public String getRedirectedHost() {
-        return redirectedHost;
+        return redirectedHost.toString();
     }
 
 }

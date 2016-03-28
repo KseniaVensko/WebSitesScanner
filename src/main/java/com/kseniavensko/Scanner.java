@@ -43,10 +43,10 @@ public class Scanner extends Observable implements IScanner {
                 }
             } catch (IOException e) {
                 logger.log("Can not read from connection.");
-                result.setStringStatus("Connection failed\n");
+                result.setStringStatus("\nConnection failed\n");
             } catch (RuntimeException e) {
-                logger.log("Can not open connection to proxy " + proxy.getAddr());
-                result.setStringStatus("Connection failed\n");
+                logger.log(e.getMessage());
+                result.setStringStatus("\nConnection failed\n");
             } catch (Exception e) {
                 logger.log(e.getMessage());
             }
@@ -79,7 +79,6 @@ public class Scanner extends Observable implements IScanner {
                     Result.Cookie c = new Result().new Cookie();
                     if (m.matches()) {
                         c.name = m.group(1);
-                        //TODO: index of bound
                         c.value = m.group(2);
                         if (metricCookies.contains(c.name)) {
                             continue;
