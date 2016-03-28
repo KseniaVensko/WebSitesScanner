@@ -95,15 +95,14 @@ public class Scanner extends Observable implements IScanner {
                         if (flags.toLowerCase().contains("secure")) {
                             c.value += "; secure";
                         }
-                        result.add(c);
                     }
                     else {
                         c.name = "";
                         c.value = cookie;
                         c.status = Result.Status.Warning;
                         c.detailedInfo = "Can not parse this cookie. Maybe it is not correct.";
-                        result.add(c);
                     }
+                    result.add(c);
                 }
             }
         }
