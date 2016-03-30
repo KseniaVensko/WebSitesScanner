@@ -79,6 +79,8 @@ public class Result {
         Status status;
         String name;
         String value;
+        boolean isHttponly;
+        boolean isSecure;
         String detailedInfo;
     }
 }

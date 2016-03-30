@@ -27,7 +27,6 @@ public class Scanner extends Observable implements IScanner {
             }
             Result result = new Result();
             result.setHost(host);
-
             result.setStringStatus("\nConnection established\n");
 
             Map<String, List<String>> responseHeaders = new TreeMap<>();
@@ -51,9 +50,11 @@ public class Scanner extends Observable implements IScanner {
                 logger.log(e.getMessage());
             }
 
+
             result.setInformationHeaders(parseInformationHeaders(responseHeaders));
             result.setSecureHeaders(parseSecureHeaders(responseHeaders));
-            result.setSecureCookies(parseCookieHeader(responseHeaders.get("set-cookie")));
+            //TODO: check for https more efficiently
+            result.setSecureCookies(parseCookieHeader(responseHeaders.get("set-cookie"), result.getRedirectedHost().contains("https")));
 
             results.add(result);
             i++;
@@ -62,7 +63,7 @@ public class Scanner extends Observable implements IScanner {
         }
     }
 
-    private List<Result.Cookie> parseCookieHeader(List<String> cookies) {
+    private List<Result.Cookie> parseCookieHeader(List<String> cookies, boolean isSecure) {
         List<Result.Cookie> result = new ArrayList<>();
         if (cookies != null) {
             PropertiesReader reader = new PropertiesReader();
@@ -72,6 +73,7 @@ public class Scanner extends Observable implements IScanner {
             } catch (Exception e) {
                 logger.log("Can not read metric cookies from property file. Returning empty cookies set.");
             }
+            boolean correct = false;
             for (String cookie : cookies) {
                 if (cookie != null) {
                     Matcher m = cookiePattern.matcher(cookie);
@@ -83,20 +85,30 @@ public class Scanner extends Observable implements IScanner {
                         if (metricCookies.contains(c.name)) {
                             continue;
                         }
-                        if (flags.toLowerCase().contains("httponly") && flags.toLowerCase().contains("secure")) {
+                        correct = false;
+                        if (flags.toLowerCase().contains("httponly")) {
+                            c.isHttponly = true;
+                            correct = true;
+                            if (isSecure) {
+                                if (flags.toLowerCase().contains("secure")) {
+                                    c.isSecure = true;
+                                } else {
+                                    c.isSecure = false;
+                                    correct = false;
+                                }
+                            }
+                        }
+                        else {
+                            c.isHttponly = false;
+                        }
+
+                        if (correct) {
                             c.status = Result.Status.Correct;
                         } else {
                             c.status = Result.Status.Warning;
                             c.detailedInfo = "Cookie should contain flags httponly and secure";
                         }
-                        if (flags.toLowerCase().contains("httponly")) {
-                            c.value += "; httponly";
-                        }
-                        if (flags.toLowerCase().contains("secure")) {
-                            c.value += "; secure";
-                        }
-                    }
-                    else {
+                    } else {
                         c.name = "";
                         c.value = cookie;
                         c.status = Result.Status.Warning;
