@@ -42,11 +42,12 @@ public class Connection implements IConnection {
             }
 //          URL base, next;
             int responseCode = connection.getResponseCode();
+            String redirected;
             if (String.valueOf(responseCode).matches("3[0-9]{2}")) {
                 String location = connection.getHeaderField("Location");
                 if (location != null) {
                     redirectedHost.append(location);
-                    url = new URL(redirectedHost.toString());
+                    url = new URL(location);
                     redirectedHost.append(" with " + responseCode + " code, ");
                     //base = new URL(url.toString());
                     //next = new URL(base, location);  // Deal with relative URLs
