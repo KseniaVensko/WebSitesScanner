@@ -8,8 +8,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * parse proxy console argument
  * socks://10.10.10.10:8080
  * http://10.0.0.1:8888
+ * proto can be socks or httponly
+ * returns ProxyToScan
  */
 public class ProxyConverter implements IStringConverter<ProxyToScan> {
     Pattern p = Pattern.compile("(socks|http)\\:\\/\\/((?:[0-9]{1,3}\\.){3}[0-9]{1,3})\\:([0-9]+)");

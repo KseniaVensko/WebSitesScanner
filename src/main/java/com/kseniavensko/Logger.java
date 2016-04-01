@@ -1,5 +1,8 @@
 package com.kseniavensko;
 
+/**
+ * fill string log during scanning
+ */
 public class Logger {
     private static Logger ourInstance = new Logger();
     private StringBuilder stringLog;

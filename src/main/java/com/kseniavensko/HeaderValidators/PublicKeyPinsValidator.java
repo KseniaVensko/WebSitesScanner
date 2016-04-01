@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * rfc 7469
- */
+ **/
 public class PublicKeyPinsValidator implements IHeaderValidator {
     private List<String> values;
 
@@ -14,6 +14,13 @@ public class PublicKeyPinsValidator implements IHeaderValidator {
         this.values = values;
     }
 
+/**
+ * @return valid or not and detailed info if it is not (ValidationResult)
+ *
+ *  check if the value of  the header contains required attribute max-age and attribute pin-sha256
+ * doesn't validate the content of attributes
+ * fills ValidationResult (set boolean isValid and set detailed info also if it is not)
+ */
     public ValidationResult validate() {
         ValidationResult result = new ValidationResult();
         for (String val : values) {

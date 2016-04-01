@@ -9,11 +9,23 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * scans hosts one by one and fills results. Sends scanning progress to ProgressObserver
+ */
 public class Scanner extends Observable implements IScanner {
     private List<Result> results = new ArrayList<Result>();
     private Pattern cookiePattern = Pattern.compile("\\s*([^()<>@,;:\\\"\\/\\[\\]?={}]*)=(.*?);(.*)");
     private Logger logger = Logger.getInstance();
 
+    /**
+     * for each host creates new connection(with proxy if proxy is not null), gets all response headers and
+     * saves to result only those headers, which names are listed in informationHeaders and recommendedSecureHeaders. Validates
+     * this headers. Parses cookie header and validates.
+     * @param hosts
+     * @param proxy
+     * @param headers
+     * @param resolveDns
+     */
     public void scan(List<URL> hosts, ProxyToScan proxy, List<HeaderArgument> headers, boolean resolveDns) {
         int i = 0;
         int j = hosts.size();

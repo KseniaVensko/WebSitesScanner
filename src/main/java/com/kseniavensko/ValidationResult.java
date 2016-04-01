@@ -1,5 +1,9 @@
 package com.kseniavensko;
 
+/**
+ * represents the result of validation
+ * if valid is true then detailedInfo should be empty
+ */
 public class ValidationResult {
     private boolean valid;
     private StringBuilder detailedInfo = new StringBuilder();

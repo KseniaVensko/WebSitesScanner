@@ -17,6 +17,13 @@ public class ContentSecurityPolicyValidator implements IHeaderValidator {
         this.values = values;
     }
 
+    /**
+     * @return valid or not and detailed info if it is not (ValidationResult)
+     *   check header value if it doesn't contain unsafe-inline(data:) or unsafe-eval(blob:, filesystem:) directives
+     *  and if it contains frame-ancestors and form-action directives
+     *  check if value doesn't contain the mask * for url addresses
+     *  fills ValidationResult (set boolean isValid and set detailed info also if it is not)
+     */
     public ValidationResult validate() {
         ValidationResult result = new ValidationResult();
         Set<String> directives = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);

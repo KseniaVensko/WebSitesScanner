@@ -7,6 +7,9 @@ import java.util.Collections;
 import java.util.Properties;
 import java.util.TreeSet;
 
+/**
+ * reads properties from file config.properties
+ */
 public class PropertiesReader {
     public TreeSet<String> readCookies() throws Exception {
         TreeSet<String> cookies = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);

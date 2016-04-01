@@ -8,6 +8,10 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * parse url argument [scheme://]host[:port] where scheme part and port are not required. Do not check the correctness of url
+ * returns URL
+ */
 public class UrlConverter implements IStringConverter<URL> {
     public URL convert(String s) {
         try {

@@ -23,6 +23,12 @@ public class Connection implements IConnection {
         this.headers = headers;
     }
 
+    /**
+     * @return Map<String, List<String>> headers or null if can not connect
+     * fills redirectedHost with all redirections(including protocol changes)
+     * @throws IOException
+     * @throws RuntimeException
+     */
     public Map<String, List<String>> getResponseHeaders() throws IOException, RuntimeException {
         HttpURLConnection connection = null;
         URL url = host;

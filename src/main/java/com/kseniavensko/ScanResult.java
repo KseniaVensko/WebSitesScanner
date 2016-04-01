@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * array of results for each host
+ */
 @SuppressWarnings("unchecked")
 public class ScanResult {
     private List<Result> results;

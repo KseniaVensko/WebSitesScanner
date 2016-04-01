@@ -1,5 +1,8 @@
 package com.kseniavensko;
 
+/**
+ * represents proxy which is parsed from user input
+ */
 public class ProxyToScan {
     private String proto;
     private String addr;

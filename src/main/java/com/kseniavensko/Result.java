@@ -6,6 +6,9 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * represents result of scanning for one host
+ */
 public class Result {
     private URL host;
     private String redirectedHost;

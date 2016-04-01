@@ -17,6 +17,12 @@ public class StrictTransportSecurityValidator implements IHeaderValidator{
         this.values = values;
     }
 
+    /**
+     * @return valid or not and detailed info if it is not (ValidationResult)
+     * check if the value of the header contains required attribute max-age
+     * doesn't check the content of the attributes
+     * fills ValidationResult (set boolean isValid and set detailed info also if it is not)
+     */
     public ValidationResult validate() {
         ValidationResult result = new ValidationResult();
         for (String val : values) {
