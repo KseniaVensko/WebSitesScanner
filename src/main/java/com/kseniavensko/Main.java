@@ -21,65 +21,16 @@ public class Main {
         final Arguments jct = new Arguments();
 
         JCommander jcm = new JCommander(jct, args);
-        if (jct.help) {
-            jcm.usage();
-            return;
-        }
-
-        List<URL> hosts = new ArrayList<>();
-
-        if (jct.file != null) {
-            UrlsReaderFromFile reader = new UrlsReaderFromFile();
-            try {
-                hosts = reader.read(jct.file);
-            } catch (FileNotFoundException e) {
-                logger.log("Input file " + jct.file + " was not found.");
-            } catch (IOException e) {
-                logger.log("Can not read from  " + jct.file);
-            }
-        }
-        // I`ve decided to allow use --host and --input_file together
-        if (jct.hosts != null) {
-            try {
-                hosts.addAll(jct.hosts);
-            }
-            catch (Exception e) {
-                logger.log("Can not properly add input hosts to collection to check.");
-            }
-        }
-
-        final List<URL> finalHosts = hosts;
-
-        if (finalHosts.isEmpty()) {
-            System.out.println("--host or --input_file is required\n");
-            return;
-        }
-
-        for (URL host : finalHosts) {
-            if (host == null) {
-                logger.log("Host is null.");
-                return;
-            }
-        }
-
-        if (jct.headers != null) {
-            for (HeaderArgument header : jct.headers) {
-                if (header.value == null) {
-                    System.out.println("header value is not correct for header : " + header.name);
-                    return;
-                }
-            }
-        }
-
-        if (jct.proxy != null && !jct.proxy.isCorrect()) {
-            System.out.println("Proxy value is not correct. See Readme for proper usage.");
+        ArgumentsChecker checker = new ArgumentsChecker();
+        CheckedArguments arg = checker.check(jct);
+        if (!arg.correct) {
             return;
         }
 
         final ProgressObserver ob = new ProgressObserver();
         Scanner scanner = new Scanner();
         scanner.addObserver(ob);
-        scanner.scan(finalHosts, jct.proxy, jct.headers, false);
+        scanner.scan(arg.hosts, arg.proxy, arg.headers, false);
         ScanResult result = scanner.returnResults();
         result.toConsole();
         if (jct.json_file != null) {
