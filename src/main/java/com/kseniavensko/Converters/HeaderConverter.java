@@ -1,7 +1,7 @@
 package com.kseniavensko.Converters;
 
 import com.beust.jcommander.IStringConverter;
-import com.kseniavensko.HeaderArgument;
+import com.kseniavensko.Args.HeaderArgument;
 
 /**
  * parse header argument in format header:value

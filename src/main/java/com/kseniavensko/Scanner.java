@@ -1,5 +1,7 @@
 package com.kseniavensko;
 
+import com.kseniavensko.Args.HeaderArgument;
+import com.kseniavensko.Args.ProxyToScan;
 import com.kseniavensko.HeaderValidators.*;
 
 import java.io.IOException;
@@ -21,10 +23,6 @@ public class Scanner extends Observable implements IScanner {
      * for each host creates new connection(with proxy if proxy is not null), gets all response headers and
      * saves to result only those headers, which names are listed in informationHeaders and recommendedSecureHeaders. Validates
      * this headers. Parses cookie header and validates.
-     * @param hosts
-     * @param proxy
-     * @param headers
-     * @param resolveDns
      */
     public void scan(List<URL> hosts, ProxyToScan proxy, List<HeaderArgument> headers, boolean resolveDns) {
         int i = 0;
@@ -62,16 +60,20 @@ public class Scanner extends Observable implements IScanner {
                 logger.log(e.getMessage());
             }
 
+            try {
+                result.setInformationHeaders(parseInformationHeaders(responseHeaders));
+                result.setSecureHeaders(parseSecureHeaders(responseHeaders));
+                //TODO: check for https more efficiently
+                result.setSecureCookies(parseCookieHeader(responseHeaders.get("set-cookie"), result.getRedirectedHost().contains("https")));
 
-            result.setInformationHeaders(parseInformationHeaders(responseHeaders));
-            result.setSecureHeaders(parseSecureHeaders(responseHeaders));
-            //TODO: check for https more efficiently
-            result.setSecureCookies(parseCookieHeader(responseHeaders.get("set-cookie"), result.getRedirectedHost().contains("https")));
-
-            results.add(result);
-            i++;
-            setChanged();
-            notifyObservers("scanned: " + i + "/" + j);
+                results.add(result);
+                i++;
+                setChanged();
+                notifyObservers("scanned: " + i + "/" + j);
+            }
+            catch (NullPointerException e) {
+                logger.log(e.toString());
+            }
         }
     }
 

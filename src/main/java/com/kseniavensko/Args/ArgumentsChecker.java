@@ -1,4 +1,7 @@
-package com.kseniavensko;
+package com.kseniavensko.Args;
+
+import com.kseniavensko.Logger;
+import com.kseniavensko.UrlsReaderFromFile;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

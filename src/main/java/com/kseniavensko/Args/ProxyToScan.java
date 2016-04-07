@@ -1,4 +1,4 @@
-package com.kseniavensko;
+package com.kseniavensko.Args;
 
 /**
  * represents proxy which is parsed from user input

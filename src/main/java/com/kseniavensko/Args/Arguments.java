@@ -1,4 +1,4 @@
-package com.kseniavensko;
+package com.kseniavensko.Args;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.FileConverter;

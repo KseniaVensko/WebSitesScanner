@@ -1,4 +1,4 @@
-package com.kseniavensko;
+package com.kseniavensko.Args;
 
 /**
  * represent header parsed from user input

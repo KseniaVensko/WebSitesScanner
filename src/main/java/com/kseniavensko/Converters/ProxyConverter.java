@@ -2,7 +2,7 @@ package com.kseniavensko.Converters;
 
 import com.beust.jcommander.IStringConverter;
 import com.kseniavensko.Logger;
-import com.kseniavensko.ProxyToScan;
+import com.kseniavensko.Args.ProxyToScan;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -1,13 +1,9 @@
 package com.kseniavensko;
 
 import com.beust.jcommander.JCommander;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.kseniavensko.Args.Arguments;
+import com.kseniavensko.Args.ArgumentsChecker;
+import com.kseniavensko.Args.CheckedArguments;
 
 //curl -I site  - retreive headers (to compare with my implementation)
 

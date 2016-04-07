@@ -1,6 +1,8 @@
 package com.kseniavensko.Fakes;
 
 import com.kseniavensko.*;
+import com.kseniavensko.Args.HeaderArgument;
+import com.kseniavensko.Args.ProxyToScan;
 
 import java.net.URL;
 import java.util.*;

@@ -60,7 +60,7 @@ public class ScanResult {
                         add("Httponly");
                         add("Secure");
                         add("Status");
-                        add("Descriptoin");
+                        add("Description");
                     }};
                     System.out.println("\nSession cookies");
                     TableFormatter tf = createTable(cookieList);

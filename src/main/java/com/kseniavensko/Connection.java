@@ -1,5 +1,8 @@
 package com.kseniavensko;
 
+import com.kseniavensko.Args.HeaderArgument;
+import com.kseniavensko.Args.ProxyToScan;
+
 import java.io.IOException;
 import java.net.*;
 import java.util.List;
