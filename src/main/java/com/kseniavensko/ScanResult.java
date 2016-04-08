@@ -114,6 +114,7 @@ public class ScanResult {
                 }
                 options.put("session_cookies", sessionCookies);
             }
+            options.put("connected" , String.valueOf(result.getStringStatus().equals("\nConnection established\n")));
             hosts.put(result.getHost().getAuthority(), options);
         }
 
